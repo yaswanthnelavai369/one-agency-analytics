@@ -1,0 +1,131 @@
+<?php
+
+use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
+
+/**
+ * Schema compatible with spatie/laravel-permission (teams feature enabled),
+ * using agency_id as the "team" foreign key so roles/permissions can be
+ * scoped per-agency in addition to global platform roles (agency_id = null).
+ */
+return new class extends Migration
+{
+    public function up(): void
+    {
+        $teams = true;
+        $tableNames = [
+            'roles' => 'roles',
+            'permissions' => 'permissions',
+            'model_has_permissions' => 'model_has_permissions',
+            'model_has_roles' => 'model_has_roles',
+            'role_has_permissions' => 'role_has_permissions',
+        ];
+        $columnNames = [
+            'model_morph_key' => 'model_id',
+            'team_foreign_key' => 'agency_id',
+        ];
+
+        Schema::create($tableNames['permissions'], function (Blueprint $table) {
+            $table->id();
+            $table->string('name');
+            $table->string('guard_name');
+            $table->string('module')->nullable()->index(); // e.g. "dashboards", "integrations", "billing"
+            $table->timestamps();
+            $table->unique(['name', 'guard_name']);
+        });
+
+        Schema::create($tableNames['roles'], function (Blueprint $table) use ($teams, $columnNames) {
+            $table->id();
+            if ($teams) {
+                $table->unsignedBigInteger($columnNames['team_foreign_key'])->nullable()->index();
+            }
+            $table->string('name');
+            $table->string('guard_name');
+            $table->boolean('is_system_role')->default(false); // Master Admin, Agency Owner, Client Owner
+            $table->timestamps();
+
+            if ($teams) {
+                $table->unique([$columnNames['team_foreign_key'], 'name', 'guard_name']);
+            } else {
+                $table->unique(['name', 'guard_name']);
+            }
+        });
+
+        Schema::create($tableNames['model_has_permissions'], function (Blueprint $table) use ($tableNames, $columnNames, $teams) {
+            $table->unsignedBigInteger('permission_id');
+            $table->string('model_type');
+            $table->unsignedBigInteger($columnNames['model_morph_key']);
+            $table->index([$columnNames['model_morph_key'], 'model_type'], 'model_has_permissions_model_id_model_type_index');
+
+            $table->foreign('permission_id')
+                ->references('id')->on($tableNames['permissions'])
+                ->onDelete('cascade');
+
+            if ($teams) {
+                $table->unsignedBigInteger($columnNames['team_foreign_key']);
+                $table->index($columnNames['team_foreign_key'], 'model_has_permissions_agency_id_index');
+
+                $table->primary(
+                    [$columnNames['team_foreign_key'], 'permission_id', $columnNames['model_morph_key'], 'model_type'],
+                    'model_has_permissions_permission_model_type_primary'
+                );
+            } else {
+                $table->primary(
+                    ['permission_id', $columnNames['model_morph_key'], 'model_type'],
+                    'model_has_permissions_permission_model_type_primary'
+                );
+            }
+        });
+
+        Schema::create($tableNames['model_has_roles'], function (Blueprint $table) use ($tableNames, $columnNames, $teams) {
+            $table->unsignedBigInteger('role_id');
+            $table->string('model_type');
+            $table->unsignedBigInteger($columnNames['model_morph_key']);
+            $table->index([$columnNames['model_morph_key'], 'model_type'], 'model_has_roles_model_id_model_type_index');
+
+            $table->foreign('role_id')
+                ->references('id')->on($tableNames['roles'])
+                ->onDelete('cascade');
+
+            if ($teams) {
+                $table->unsignedBigInteger($columnNames['team_foreign_key']);
+                $table->index($columnNames['team_foreign_key'], 'model_has_roles_agency_id_index');
+
+                $table->primary(
+                    [$columnNames['team_foreign_key'], 'role_id', $columnNames['model_morph_key'], 'model_type'],
+                    'model_has_roles_role_model_type_primary'
+                );
+            } else {
+                $table->primary(
+                    ['role_id', $columnNames['model_morph_key'], 'model_type'],
+                    'model_has_roles_role_model_type_primary'
+                );
+            }
+        });
+
+        Schema::create($tableNames['role_has_permissions'], function (Blueprint $table) use ($tableNames) {
+            $table->unsignedBigInteger('permission_id');
+            $table->unsignedBigInteger('role_id');
+
+            $table->foreign('permission_id')
+                ->references('id')->on($tableNames['permissions'])
+                ->onDelete('cascade');
+
+            $table->foreign('role_id')
+                ->references('id')->on($tableNames['roles'])
+                ->onDelete('cascade');
+
+            $table->primary(['permission_id', 'role_id']);
+        });
+    }
+
+    public function down(): void
+    {
+        Schema::drop('role_has_permissions');
+        Schema::drop('model_has_roles');
+        Schema::drop('model_has_permissions');
+        Schema::drop('roles');
+        Schema::drop('permissions');
+    }
+};
