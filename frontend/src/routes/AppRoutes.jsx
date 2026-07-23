@@ -1,0 +1,50 @@
+import { Routes, Route, Navigate } from 'react-router-dom';
+import LoginPage from '../pages/auth/LoginPage';
+import RegisterPage from '../pages/auth/RegisterPage';
+import TwoFactorPage from '../pages/auth/TwoFactorPage';
+import DashboardLayout from '../components/layout/DashboardLayout';
+import OverviewPage from '../pages/dashboard/OverviewPage';
+import ClientsListPage from '../pages/clients/ClientsListPage';
+import ComingSoonPage from '../pages/dashboard/ComingSoonPage';
+import ProtectedRoute from './ProtectedRoute';
+
+export default function AppRoutes() {
+  return (
+    <Routes>
+      <Route path="/login" element={<LoginPage />} />
+      <Route path="/register" element={<RegisterPage />} />
+      <Route path="/two-factor" element={<TwoFactorPage />} />
+
+      <Route
+        path="/dashboard"
+        element={
+          <ProtectedRoute>
+            <DashboardLayout />
+          </ProtectedRoute>
+        }
+      >
+        <Route index element={<OverviewPage />} />
+        <Route path="clients" element={<ClientsListPage />} />
+        <Route
+          path="insights"
+          element={<ComingSoonPage title="AI Insights" description="Ask questions about your data in plain English once the AI module ships." />}
+        />
+        <Route
+          path="reports"
+          element={<ComingSoonPage title="Reports" description="Scheduled, white-labeled PDF/Excel reports land here." />}
+        />
+        <Route
+          path="integrations"
+          element={<ComingSoonPage title="Integrations" description="Connect GA4, Search Console, Ads platforms, and CRMs." />}
+        />
+        <Route
+          path="settings"
+          element={<ComingSoonPage title="Settings" description="Branding, team, billing, and account settings." />}
+        />
+      </Route>
+
+      <Route path="/" element={<Navigate to="/dashboard" replace />} />
+      <Route path="*" element={<Navigate to="/dashboard" replace />} />
+    </Routes>
+  );
+}
