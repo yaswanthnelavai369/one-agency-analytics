@@ -26,14 +26,15 @@ class RBACService
         'billing' => ['view', 'manage'],
         'settings' => ['view', 'edit'],
         'support' => ['view', 'create'],
+        'health' => ['view', 'recalculate'],
     ];
 
     /** System roles auto-created for every agency, with sane default abilities. */
     public const SYSTEM_ROLE_DEFAULTS = [
         'Agency Owner' => '*',
-        'Manager' => ['dashboards.*', 'reports.*', 'integrations.*', 'clients.*', 'team.view', 'support.*'],
-        'Analyst' => ['dashboards.view', 'reports.view', 'reports.export', 'integrations.view'],
-        'Viewer' => ['dashboards.view', 'reports.view'],
+        'Manager' => ['dashboards.*', 'reports.*', 'integrations.*', 'clients.*', 'team.view', 'support.*', 'health.*'],
+        'Analyst' => ['dashboards.view', 'reports.view', 'reports.export', 'integrations.view', 'health.view'],
+        'Viewer' => ['dashboards.view', 'reports.view', 'health.view'],
     ];
 
     public function permissionName(string $module, string $action): string

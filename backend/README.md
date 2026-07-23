@@ -72,12 +72,26 @@ Beyond the auth/RBAC foundation described above, this now also includes:
   is one array entry, no migration. `DashboardController` exposes CRUD for layouts, add/remove
   widget, and a bulk `positions` endpoint for saving after a drag/resize session.
 
+- **AI Health Score engine** (`app/HealthScore/`): a 0–100 score per client, computed from
+  7 pluggable category calculators (Growth, SEO, Ads, Social, Website, Lead, Revenue), each
+  implementing `ScoreCalculatorInterface` — same registry pattern as Integrations and
+  Dashboard widgets, so adding a category (e.g. once Core Web Vitals data exists) is one class.
+  `ScoreMath` centralizes the normalization formulas (documented, linear-clamp based — no
+  black-box model) and re-normalizes weights when a category has no data yet, so a client with
+  only GA4 connected still gets a meaningful score from what's actually available. Each
+  calculator also emits plain-language improvement suggestions when its score is low.
+  `HealthScoreService` computes-and-stores one row/day in `health_scores` (powering both
+  "today's score" and 90-day trend/historical-comparison views), `ComputeHealthScoreJob` +
+  the `health-scores:compute` scheduled command run this nightly after integration syncs.
+
 ## What's deliberately NOT here yet
 
-This is the foundation only, per your last message. This is the foundation plus two full vertical modules. Not yet built (next milestones):
+This is the foundation only, per your last message. This is the foundation plus three full vertical modules. Not yet built (next milestones):
 - React frontend for the remaining screens (Insights, Reports, Settings)
 - More integration connectors (Search Console, Google Ads, Meta Ads, LinkedIn, TikTok, CRMs, ...)
-- AI Health Score engine, AI chat assistant, anomaly detection
+- AI chat assistant, automated anomaly detection (Health Score's suggestions are rule-based
+  today — an LLM call could generate more personalized recommendations on top of the same
+  category signals)
 - Billing, scheduled reports, notifications
 
 ## Getting it running

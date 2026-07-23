@@ -54,6 +54,13 @@ provider, get redirected to Google's consent screen, land back on this page via 
 callback route (`?connected=...` or `?error=...`), then Sync now / Disconnect per connected
 integration.
 
+## AI Health Score
+
+`HealthScorePage` renders the live backend score: an animated 0–100 ring gauge, a 7-category
+breakdown (Growth/SEO/Ads/Social/Website/Leads/Revenue), a 90-day trend line (Recharts), and
+the rule-based improvement suggestions the backend generates per category. "Recalculate" forces
+an on-demand recompute rather than waiting for the nightly job.
+
 ## Running it
 
 ```bash
@@ -70,8 +77,9 @@ an integration module (GA4, etc.) is wired up to feed real metrics.
 
 - Wire `/dashboard/insights`, `/reports`, `/settings` (currently placeholders)
 - Replace WidgetRenderer's placeholder data with real queries against `analytics_metrics`
-  once metrics are flowing in from a synced integration
+  and the Health Score API once metrics are flowing in from a synced integration
 - More integration providers (Search Console, Google Ads, Meta Ads, ...) — the Integrations
   page already renders whatever the backend's catalogue returns, so no frontend change needed
   when a new provider is added backend-side
-- Code-split the bundle (currently a single ~690kB chunk)
+- Code-split the bundle (currently a single ~1MB chunk — recharts + react-grid-layout are the
+  main contributors; worth lazy-loading per-route)

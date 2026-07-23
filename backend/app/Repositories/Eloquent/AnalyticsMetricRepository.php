@@ -47,4 +47,32 @@ class AnalyticsMetricRepository implements AnalyticsMetricRepositoryInterface
 
         return $row ? (float) $row->value : null;
     }
+
+    public function sumBetween(int $clientId, string $metric, string $from, string $to): float
+    {
+        return (float) $this->model->newQuery()
+            ->where('client_id', $clientId)
+            ->where('metric', $metric)
+            ->whereBetween('date', [$from, $to])
+            ->sum('value');
+    }
+
+    public function averageBetween(int $clientId, string $metric, string $from, string $to): ?float
+    {
+        $avg = $this->model->newQuery()
+            ->where('client_id', $clientId)
+            ->where('metric', $metric)
+            ->whereBetween('date', [$from, $to])
+            ->avg('value');
+
+        return $avg !== null ? (float) $avg : null;
+    }
+
+    public function hasData(int $clientId, string $metric): bool
+    {
+        return $this->model->newQuery()
+            ->where('client_id', $clientId)
+            ->where('metric', $metric)
+            ->exists();
+    }
 }

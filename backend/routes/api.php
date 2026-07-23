@@ -3,6 +3,7 @@
 use App\Http\Controllers\Api\V1\Admin\AgencyController as AdminAgencyController;
 use App\Http\Controllers\Api\V1\Agency\ClientController;
 use App\Http\Controllers\Api\V1\Agency\DashboardController;
+use App\Http\Controllers\Api\V1\Agency\HealthScoreController;
 use App\Http\Controllers\Api\V1\Agency\IntegrationController;
 use App\Http\Controllers\Api\V1\Auth\AuthController;
 use App\Http\Controllers\Api\V1\Auth\TwoFactorController;
@@ -81,6 +82,9 @@ Route::prefix('v1')->group(function () {
             Route::middleware('permission:dashboards.edit')->post('/dashboards/{dashboard}/widgets', [DashboardController::class, 'addWidget']);
             Route::middleware('permission:dashboards.edit')->put('/dashboards/{dashboard}/widgets/positions', [DashboardController::class, 'savePositions']);
             Route::middleware('permission:dashboards.edit')->delete('/dashboards/{dashboard}/widgets/{widget}', [DashboardController::class, 'removeWidget']);
+
+            Route::middleware('permission:health.view')->get('/clients/{client}/health-score', [HealthScoreController::class, 'show']);
+            Route::middleware('permission:health.recalculate')->post('/clients/{client}/health-score/recalculate', [HealthScoreController::class, 'recalculate']);
 
             // Route::apiResource('/team', TeamMemberController::class); // invite/list/update/remove
             // Route::put('/branding', [AgencyBrandingController::class, 'update']);
