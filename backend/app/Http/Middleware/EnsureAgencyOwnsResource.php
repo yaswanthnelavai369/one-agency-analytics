@@ -23,6 +23,28 @@ class EnsureAgencyOwnsResource
         }
 
         if ($user->isMasterAdmin()) {
+            $agencyId = $request->header('X-Agency-ID') ?: $request->input('agency_id');
+            if ($agencyId) {
+                $agency = \App\Models\Agency::where('id', $agencyId)->orWhere('uuid', $agencyId)->first();
+                if ($agency) {
+                    $user->agency_id = $agency->id;
+                    $user->setRelation('agency', $agency);
+                }
+            } else {
+                $agency = \App\Models\Agency::first();
+                if ($agency) {
+                    $user->agency_id = $agency->id;
+                    $user->setRelation('agency', $agency);
+                }
+            }
+
+            if (is_null($user->agency_id)) {
+                return response()->json([
+                    'message' => 'No agency context. Please create an agency or register an account first.',
+                    'error_code' => 'NO_AGENCY_CONTEXT'
+                ], 400);
+            }
+
             return $next($request);
         }
 

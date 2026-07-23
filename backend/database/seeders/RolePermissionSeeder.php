@@ -52,5 +52,43 @@ class RolePermissionSeeder extends Seeder
         );
         app()->make(PermissionRegistrar::class)->setPermissionsTeamId(null);
         $admin->syncRoles([$masterAdminRole]);
+
+        // Seed one Demo Agency and Agency Owner account for testing.
+        $demoOwner = User::firstOrCreate(
+            ['email' => 'agency@search29.ai'],
+            [
+                'uuid' => Str::uuid(),
+                'user_type' => 'agency',
+                'name' => 'Demo Agency Owner',
+                'password' => Hash::make('ChangeMe!12345'),
+                'status' => 'active',
+                'email_verified_at' => now(),
+            ]
+        );
+
+        $agencyService = app(\App\Services\Agency\AgencyService::class);
+        $plan = \App\Models\Plan::where('slug', 'professional')->first() ?: \App\Models\Plan::first();
+
+        $demoAgency = \App\Models\Agency::where('owner_id', $demoOwner->id)->first();
+        if (!$demoAgency) {
+            $demoAgency = $agencyService->createForOwner($demoOwner, [
+                'name' => 'Search29 Agency',
+                'plan_id' => $plan?->id,
+            ]);
+        } else {
+            $demoOwner->forceFill(['agency_id' => $demoAgency->id])->save();
+        }
+
+        // Seed a demo client for the agency.
+        $clientService = app(\App\Services\Client\ClientService::class);
+        $demoClient = \App\Models\Client::where('agency_id', $demoAgency->id)->first();
+        if (!$demoClient) {
+            $clientService->createForAgency($demoAgency, [
+                'name' => 'Acme Corporation',
+                'website' => 'https://acme.example.com',
+                'industry' => 'Manufacturing',
+                'timezone' => 'UTC',
+            ]);
+        }
     }
 }

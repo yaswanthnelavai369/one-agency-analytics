@@ -19,6 +19,7 @@ import ListItemText from '@mui/material/ListItemText';
 import Chip from '@mui/material/Chip';
 import CircularProgress from '@mui/material/CircularProgress';
 import Box from '@mui/material/Box';
+import Alert from '@mui/material/Alert';
 import AddRoundedIcon from '@mui/icons-material/AddRounded';
 import SaveRoundedIcon from '@mui/icons-material/SaveRounded';
 import RestartAltRoundedIcon from '@mui/icons-material/RestartAltRounded';
@@ -82,9 +83,10 @@ export default function DashboardBuilderPage({ clientId = null }) {
     return () => observer.disconnect();
   }, []);
 
-  const { data: layoutsData, isLoading } = useQuery({
+  const { data: layoutsData, isLoading, error, isError } = useQuery({
     queryKey: ['dashboards', clientId],
     queryFn: () => dashboardsApi.list(clientId),
+    retry: false,
   });
 
   const { data: catalogueData } = useQuery({
@@ -143,7 +145,27 @@ export default function DashboardBuilderPage({ clientId = null }) {
     },
   });
 
-  if (isLoading || !layout) {
+  if (isError) {
+    return (
+      <Box sx={{ p: 3 }}>
+        <Alert severity="error">
+          {error?.response?.data?.message || 'Error loading dashboard. Please try again.'}
+        </Alert>
+      </Box>
+    );
+  }
+
+  if (createDefaultMutation.isError) {
+    return (
+      <Box sx={{ p: 3 }}>
+        <Alert severity="error">
+          {createDefaultMutation.error?.response?.data?.message || 'Failed to initialize default dashboard.'}
+        </Alert>
+      </Box>
+    );
+  }
+
+  if (isLoading || (!layout && !isError && !createDefaultMutation.isError)) {
     return (
       <Stack alignItems="center" py={8}>
         <CircularProgress size={28} />
@@ -152,7 +174,7 @@ export default function DashboardBuilderPage({ clientId = null }) {
   }
 
   const gridLayout = (pendingLayout || layout.widgets).map((w) => ({
-    i: String(w.id),
+    i: String(w.id !== undefined ? w.id : w.i),
     x: w.x,
     y: w.y,
     w: w.w,
