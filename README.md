@@ -24,7 +24,9 @@ frontend/   React + Vite + MUI SPA — glassmorphism design system, auth flows,
   the pluggable template for future connectors (`app/Integrations/`)
 - ✅ Dashboard builder (backend + frontend): drag/drop/resize widget grid persisted to the
   backend, widget catalogue covering the full spec'd widget set
+- ✅ AI Health Score engine (backend + frontend): 0–100 score per client from 7 pluggable
+  category calculators, 90-day trend, rule-based improvement suggestions
 - ⬜ More integration connectors (Search Console, Google Ads, Meta Ads, LinkedIn, TikTok, CRMs, ...)
-- ⬜ AI Health Score, AI chat assistant, anomaly detection
+- ⬜ AI chat assistant, automated anomaly detection
 - ⬜ Billing, scheduled reports, notifications
 
