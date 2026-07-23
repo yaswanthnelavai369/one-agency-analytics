@@ -53,6 +53,7 @@ return new class extends Migration
         });
 
         Schema::create($tableNames['model_has_permissions'], function (Blueprint $table) use ($tableNames, $columnNames, $teams) {
+            $table->id();
             $table->unsignedBigInteger('permission_id');
             $table->string('model_type');
             $table->unsignedBigInteger($columnNames['model_morph_key']);
@@ -63,12 +64,12 @@ return new class extends Migration
                 ->onDelete('cascade');
 
             if ($teams) {
-                $table->unsignedBigInteger($columnNames['team_foreign_key']);
+                $table->unsignedBigInteger($columnNames['team_foreign_key'])->nullable();
                 $table->index($columnNames['team_foreign_key'], 'model_has_permissions_agency_id_index');
 
-                $table->primary(
+                $table->unique(
                     [$columnNames['team_foreign_key'], 'permission_id', $columnNames['model_morph_key'], 'model_type'],
-                    'model_has_permissions_permission_model_type_primary'
+                    'model_has_permissions_permission_model_type_unique'
                 );
             } else {
                 $table->primary(
@@ -79,6 +80,7 @@ return new class extends Migration
         });
 
         Schema::create($tableNames['model_has_roles'], function (Blueprint $table) use ($tableNames, $columnNames, $teams) {
+            $table->id();
             $table->unsignedBigInteger('role_id');
             $table->string('model_type');
             $table->unsignedBigInteger($columnNames['model_morph_key']);
@@ -89,12 +91,12 @@ return new class extends Migration
                 ->onDelete('cascade');
 
             if ($teams) {
-                $table->unsignedBigInteger($columnNames['team_foreign_key']);
+                $table->unsignedBigInteger($columnNames['team_foreign_key'])->nullable();
                 $table->index($columnNames['team_foreign_key'], 'model_has_roles_agency_id_index');
 
-                $table->primary(
+                $table->unique(
                     [$columnNames['team_foreign_key'], 'role_id', $columnNames['model_morph_key'], 'model_type'],
-                    'model_has_roles_role_model_type_primary'
+                    'model_has_roles_role_model_type_unique'
                 );
             } else {
                 $table->primary(

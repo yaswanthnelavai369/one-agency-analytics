@@ -33,6 +33,6 @@ return [
     'cache' => [
         'expiration_time' => \DateInterval::createFromDateString('24 hours'),
         'key' => 'search29.permission.cache',
-        'store' => 'redis',
+        'store' => 'default',
     ],
 ];

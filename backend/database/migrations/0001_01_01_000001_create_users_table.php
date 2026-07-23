@@ -14,8 +14,8 @@ return new class extends Migration
 
             // Tenancy: a user belongs to exactly one agency (nullable for Master Admin),
             // and optionally to one client if their type is 'client'.
-            $table->foreignId('agency_id')->nullable()->constrained('agencies')->nullOnDelete();
-            $table->foreignId('client_id')->nullable()->constrained('clients')->nullOnDelete();
+            $table->unsignedBigInteger('agency_id')->nullable();
+            $table->unsignedBigInteger('client_id')->nullable();
 
             $table->enum('user_type', ['master_admin', 'agency', 'client', 'team_member'])
                 ->default('client')->index();
