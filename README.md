@@ -20,7 +20,11 @@ frontend/   React + Vite + MUI SPA — glassmorphism design system, auth flows,
 
 - ✅ Backend foundation: multi-tenant data model, auth + 2FA, RBAC
 - ✅ Frontend shell: design system, auth pages, dashboard layout, live clients page
-- ⬜ Integration modules (GA4, Search Console, Ads platforms, CRMs, ...)
-- ⬜ Dashboard builder, AI Health Score, AI chat assistant, anomaly detection
-- ⬜ Billing, reporting, notifications
+- ✅ GA4 integration (backend + frontend): real OAuth flow + GA4 Data API sync, built as
+  the pluggable template for future connectors (`app/Integrations/`)
+- ✅ Dashboard builder (backend + frontend): drag/drop/resize widget grid persisted to the
+  backend, widget catalogue covering the full spec'd widget set
+- ⬜ More integration connectors (Search Console, Google Ads, Meta Ads, LinkedIn, TikTok, CRMs, ...)
+- ⬜ AI Health Score, AI chat assistant, anomaly detection
+- ⬜ Billing, scheduled reports, notifications
 
