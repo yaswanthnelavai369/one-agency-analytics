@@ -3,10 +3,16 @@
 namespace App\Providers;
 
 use App\Repositories\Contracts\AgencyRepositoryInterface;
+use App\Repositories\Contracts\AnalyticsMetricRepositoryInterface;
 use App\Repositories\Contracts\ClientRepositoryInterface;
+use App\Repositories\Contracts\DashboardLayoutRepositoryInterface;
+use App\Repositories\Contracts\IntegrationRepositoryInterface;
 use App\Repositories\Contracts\UserRepositoryInterface;
 use App\Repositories\Eloquent\AgencyRepository;
+use App\Repositories\Eloquent\AnalyticsMetricRepository;
 use App\Repositories\Eloquent\ClientRepository;
+use App\Repositories\Eloquent\DashboardLayoutRepository;
+use App\Repositories\Eloquent\IntegrationRepository;
 use App\Repositories\Eloquent\UserRepository;
 use Illuminate\Support\ServiceProvider;
 
@@ -21,6 +27,9 @@ class RepositoryServiceProvider extends ServiceProvider
         UserRepositoryInterface::class => UserRepository::class,
         AgencyRepositoryInterface::class => AgencyRepository::class,
         ClientRepositoryInterface::class => ClientRepository::class,
+        IntegrationRepositoryInterface::class => IntegrationRepository::class,
+        AnalyticsMetricRepositoryInterface::class => AnalyticsMetricRepository::class,
+        DashboardLayoutRepositoryInterface::class => DashboardLayoutRepository::class,
     ];
 
     public function register(): void

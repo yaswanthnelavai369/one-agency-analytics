@@ -2,6 +2,8 @@
 
 use App\Http\Controllers\Api\V1\Admin\AgencyController as AdminAgencyController;
 use App\Http\Controllers\Api\V1\Agency\ClientController;
+use App\Http\Controllers\Api\V1\Agency\DashboardController;
+use App\Http\Controllers\Api\V1\Agency\IntegrationController;
 use App\Http\Controllers\Api\V1\Auth\AuthController;
 use App\Http\Controllers\Api\V1\Auth\TwoFactorController;
 use Illuminate\Support\Facades\Route;
@@ -25,6 +27,12 @@ Route::prefix('v1')->group(function () {
     Route::post('/auth/2fa/verify', [TwoFactorController::class, 'verify']);
     // Route::get('/auth/google/redirect', ...);   // Socialite - added when Google integration module ships
     // Route::get('/auth/microsoft/redirect', ...); // Socialite - added when Microsoft integration module ships
+
+    // --- OAuth callbacks: providers redirect here directly, so this is outside
+    // auth:sanctum. The signed `state` param (see IntegrationService) verifies
+    // which agency/client/user initiated the connection — not route middleware.
+    Route::get('/integrations/{provider}/callback', [IntegrationController::class, 'callback'])
+        ->name('integrations.callback');
 
     // --- Authenticated endpoints ---
     Route::middleware('auth:sanctum')->group(function () {
@@ -55,6 +63,24 @@ Route::prefix('v1')->group(function () {
             Route::middleware('permission:clients.view')->get('/clients/{client}', [ClientController::class, 'show']);
             Route::middleware('permission:clients.edit')->put('/clients/{client}', [ClientController::class, 'update']);
             Route::middleware('permission:clients.delete')->delete('/clients/{client}', [ClientController::class, 'destroy']);
+
+            Route::middleware('permission:integrations.view')->get('/integrations/catalogue', [IntegrationController::class, 'catalogue']);
+            Route::middleware('permission:integrations.view')->get('/clients/{client}/integrations', [IntegrationController::class, 'index']);
+            Route::middleware('permission:integrations.connect')->post('/clients/{client}/integrations/{provider}/connect', [IntegrationController::class, 'connect']);
+            Route::middleware('permission:integrations.view')->post('/clients/{client}/integrations/{integration}/sync', [IntegrationController::class, 'syncNow']);
+            Route::middleware('permission:integrations.disconnect')->delete('/clients/{client}/integrations/{integration}', [IntegrationController::class, 'disconnect']);
+
+            Route::middleware('permission:dashboards.view')->get('/dashboards/widget-catalogue', [DashboardController::class, 'widgetCatalogue']);
+            Route::middleware('permission:dashboards.view')->get('/dashboards', [DashboardController::class, 'index']);
+            Route::middleware('permission:dashboards.create')->post('/dashboards', [DashboardController::class, 'store']);
+            Route::middleware('permission:dashboards.view')->get('/dashboards/{dashboard}', [DashboardController::class, 'show']);
+            Route::middleware('permission:dashboards.edit')->put('/dashboards/{dashboard}', [DashboardController::class, 'update']);
+            Route::middleware('permission:dashboards.create')->post('/dashboards/{dashboard}/duplicate', [DashboardController::class, 'duplicate']);
+            Route::middleware('permission:dashboards.edit')->post('/dashboards/{dashboard}/reset', [DashboardController::class, 'reset']);
+            Route::middleware('permission:dashboards.delete')->delete('/dashboards/{dashboard}', [DashboardController::class, 'destroy']);
+            Route::middleware('permission:dashboards.edit')->post('/dashboards/{dashboard}/widgets', [DashboardController::class, 'addWidget']);
+            Route::middleware('permission:dashboards.edit')->put('/dashboards/{dashboard}/widgets/positions', [DashboardController::class, 'savePositions']);
+            Route::middleware('permission:dashboards.edit')->delete('/dashboards/{dashboard}/widgets/{widget}', [DashboardController::class, 'removeWidget']);
 
             // Route::apiResource('/team', TeamMemberController::class); // invite/list/update/remove
             // Route::put('/branding', [AgencyBrandingController::class, 'update']);

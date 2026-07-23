@@ -51,29 +51,67 @@ config/permission.php
   with recovery codes. Google/Microsoft OAuth hooks are stubbed in `routes/api.php` — wire up
   `laravel/socialite` there when you build the social-login module.
 
+## What's included (updated)
+
+Beyond the auth/RBAC foundation described above, this now also includes:
+
+- **Integrations module** (`app/Integrations/`): a pluggable connector architecture.
+  `IntegrationProviderInterface` is the contract every connector implements;
+  `IntegrationManager` is the registry mapping provider keys to classes. **Google Analytics 4**
+  is built out end-to-end as the template — real OAuth2 flow + GA4 Data API `runReport` calls
+  (see `GoogleAnalytics4Provider`). Adding the next connector (Search Console, Meta Ads, ...) is
+  one new class + one registry line; no schema or controller changes needed.
+  `IntegrationService` orchestrates connect/callback/disconnect/sync, `SyncIntegrationDataJob`
+  is the queued job the scheduler dispatches on each integration's `sync_frequency`, and
+  `analytics_metrics` is the generic time-series table every provider writes into (so dashboard
+  widgets stay provider-agnostic).
+- **Dashboard builder** (`app/Dashboard/WidgetCatalogue.php` + `DashboardService`): layouts
+  (`dashboard_layouts`) hold widgets (`dashboard_widgets`) with grid position/size, matching
+  `react-grid-layout`'s `{x, y, w, h}` shape 1:1. `WidgetCatalogue` is a single registry of every
+  widget type (covering the full KPI/list/health-score set from the spec) — adding a widget type
+  is one array entry, no migration. `DashboardController` exposes CRUD for layouts, add/remove
+  widget, and a bulk `positions` endpoint for saving after a drag/resize session.
+
 ## What's deliberately NOT here yet
 
-This is the foundation only, per your last message. Not built out (next milestones):
-- React frontend
-- Integration modules (GA4, GSC, Meta Ads, etc.)
-- Dashboard builder, widgets, AI Health Score, AI chat, anomaly detection
-- Billing, reports, notifications
+This is the foundation only, per your last message. This is the foundation plus two full vertical modules. Not yet built (next milestones):
+- React frontend for the remaining screens (Insights, Reports, Settings)
+- More integration connectors (Search Console, Google Ads, Meta Ads, LinkedIn, TikTok, CRMs, ...)
+- AI Health Score engine, AI chat assistant, anomaly detection
+- Billing, scheduled reports, notifications
 
 ## Getting it running
 
-This environment can't reach `packagist.org` to run `composer install`, so the code here hasn't
-been executed/tested against a live Laravel bootstrap. To actually run it:
+This code is the **application layer** (app/, database/migrations, database/seeders,
+routes/api.php, routes/console.php, config/permission.php, config/services.php,
+bootstrap/app.php, bootstrap/providers.php) — not a full Laravel skeleton. There's no
+`artisan`, `public/index.php`, `config/app.php`, etc. here, since those are Laravel's own
+boilerplate and this environment can't reach packagist.org to generate them.
+
+To run it for real:
 
 ```bash
-composer install
+composer create-project laravel/laravel:^12.0 search29-analytics
+cd search29-analytics
+# Copy this repo's app/, database/, routes/, config/permission.php, config/services.php,
+# bootstrap/app.php, and bootstrap/providers.php over the freshly generated skeleton's.
+composer require laravel/sanctum spatie/laravel-permission pragmarx/google2fa-laravel \
+  predis/predis barryvdh/laravel-dompdf maatwebsite/excel darkaonline/l5-swagger laravel/socialite
+
 cp .env.example .env
+# Add one line to the generated config/app.php: 'frontend_url' => env('FRONTEND_URL'),
+# (used by IntegrationController's OAuth callback redirect)
+
 php artisan key:generate
 php artisan migrate --seed   # creates admin@search29.ai / ChangeMe!12345 — change immediately
 php artisan serve
+php artisan queue:work       # needed for SyncIntegrationDataJob
+php artisan schedule:work    # needed for the hourly/daily integration sync cadence
 ```
 
-Requires: PHP 8.3+, MySQL 8+, Redis. Composer packages referenced (`laravel/sanctum`,
-`spatie/laravel-permission`, `pragmarx/google2fa-laravel`, etc.) are declared in `composer.json`.
+Requires: PHP 8.3+, MySQL 8+, Redis. Set `GOOGLE_CLIENT_ID`/`GOOGLE_CLIENT_SECRET` in `.env`
+(from a Google Cloud OAuth client with the Analytics Data API + Admin API enabled) for the
+GA4 integration to work end-to-end.
 
 ## Suggested next step
 

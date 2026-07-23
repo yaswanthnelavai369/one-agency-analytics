@@ -3,8 +3,9 @@ import LoginPage from '../pages/auth/LoginPage';
 import RegisterPage from '../pages/auth/RegisterPage';
 import TwoFactorPage from '../pages/auth/TwoFactorPage';
 import DashboardLayout from '../components/layout/DashboardLayout';
-import OverviewPage from '../pages/dashboard/OverviewPage';
+import DashboardBuilderPage from '../pages/dashboard/DashboardBuilderPage';
 import ClientsListPage from '../pages/clients/ClientsListPage';
+import IntegrationsPage from '../pages/dashboard/IntegrationsPage';
 import ComingSoonPage from '../pages/dashboard/ComingSoonPage';
 import ProtectedRoute from './ProtectedRoute';
 
@@ -23,7 +24,7 @@ export default function AppRoutes() {
           </ProtectedRoute>
         }
       >
-        <Route index element={<OverviewPage />} />
+        <Route index element={<DashboardBuilderPage />} />
         <Route path="clients" element={<ClientsListPage />} />
         <Route
           path="insights"
@@ -33,10 +34,7 @@ export default function AppRoutes() {
           path="reports"
           element={<ComingSoonPage title="Reports" description="Scheduled, white-labeled PDF/Excel reports land here." />}
         />
-        <Route
-          path="integrations"
-          element={<ComingSoonPage title="Integrations" description="Connect GA4, Search Console, Ads platforms, and CRMs." />}
-        />
+        <Route path="integrations" element={<IntegrationsPage />} />
         <Route
           path="settings"
           element={<ComingSoonPage title="Settings" description="Branding, team, billing, and account settings." />}

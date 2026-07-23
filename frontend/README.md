@@ -28,10 +28,31 @@ src/
     layout/           AuthLayout, DashboardLayout, Sidebar, Topbar
   pages/
     auth/             Login, Register, 2FA challenge
-    dashboard/         Overview (KPI grid), placeholder pages for Insights/Reports/etc.
+    dashboard/         DashboardBuilderPage (drag/drop/resize grid, react-grid-layout),
+                        IntegrationsPage (live OAuth connect flow), placeholders for
+                        Insights/Reports/Settings
     clients/           Clients list (live-wired to backend via React Query)
   routes/             AppRoutes, ProtectedRoute
 ```
+
+## Dashboard builder
+
+`DashboardBuilderPage` renders a `react-grid-layout` grid backed by the backend's
+`dashboard_layouts`/`dashboard_widgets` tables:
+- Drag to rearrange, resize by the corner handle — changes are held in local state and
+  committed to the backend only when "Save layout" is clicked (bulk `PUT .../widgets/positions`)
+- "Add widget" opens a catalogue picker (`/agency/dashboards/widget-catalogue`), grouped by
+  category, driven entirely by the backend's `WidgetCatalogue` registry
+- `WidgetRenderer` maps a widget's `kind` (`kpi` | `list` | `health_score`) to its component —
+  currently deterministic placeholder data per widget until real metrics are wired up
+- "Reset" restores the default widget set
+
+## Integrations
+
+`IntegrationsPage` is wired to the real backend OAuth flow: pick a client, click Connect on a
+provider, get redirected to Google's consent screen, land back on this page via the backend's
+callback route (`?connected=...` or `?error=...`), then Sync now / Disconnect per connected
+integration.
 
 ## Running it
 
@@ -47,8 +68,10 @@ an integration module (GA4, etc.) is wired up to feed real metrics.
 
 ## What's next
 
-- Wire `/dashboard/insights`, `/reports`, `/integrations`, `/settings` (currently placeholders)
-- Replace placeholder Overview KPIs with real data once an integration module exists
-- Drag-and-drop dashboard builder
-- Code-split the bundle (currently a single ~570kB chunk — fine for a shell, worth splitting
-  once more pages/charting libraries are added)
+- Wire `/dashboard/insights`, `/reports`, `/settings` (currently placeholders)
+- Replace WidgetRenderer's placeholder data with real queries against `analytics_metrics`
+  once metrics are flowing in from a synced integration
+- More integration providers (Search Console, Google Ads, Meta Ads, ...) — the Integrations
+  page already renders whatever the backend's catalogue returns, so no frontend change needed
+  when a new provider is added backend-side
+- Code-split the bundle (currently a single ~690kB chunk)
