@@ -64,6 +64,9 @@ return new class extends Migration
                 ->onDelete('cascade');
 
             if ($teams) {
+                // Nullable: global (non-team-scoped) grants have agency_id = null, which a
+                // composite PRIMARY KEY can't accommodate (PK columns are implicitly NOT
+                // NULL) — hence the surrogate id() above plus a unique index here instead.
                 $table->unsignedBigInteger($columnNames['team_foreign_key'])->nullable();
                 $table->index($columnNames['team_foreign_key'], 'model_has_permissions_agency_id_index');
 
@@ -91,6 +94,8 @@ return new class extends Migration
                 ->onDelete('cascade');
 
             if ($teams) {
+                // Same reasoning as model_has_permissions above: Master Admin's role
+                // assignment uses agency_id = null (a global, unscoped role).
                 $table->unsignedBigInteger($columnNames['team_foreign_key'])->nullable();
                 $table->index($columnNames['team_foreign_key'], 'model_has_roles_agency_id_index');
 

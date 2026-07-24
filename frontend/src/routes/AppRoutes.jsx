@@ -6,6 +6,7 @@ import DashboardLayout from '../components/layout/DashboardLayout';
 import DashboardBuilderPage from '../pages/dashboard/DashboardBuilderPage';
 import ClientsListPage from '../pages/clients/ClientsListPage';
 import HealthScorePage from '../pages/dashboard/HealthScorePage';
+import AIChatPage from '../pages/dashboard/AIChatPage';
 import IntegrationsPage from '../pages/dashboard/IntegrationsPage';
 import ComingSoonPage from '../pages/dashboard/ComingSoonPage';
 import ProtectedRoute from './ProtectedRoute';
@@ -28,10 +29,7 @@ export default function AppRoutes() {
         <Route index element={<DashboardBuilderPage />} />
         <Route path="clients" element={<ClientsListPage />} />
         <Route path="health-score" element={<HealthScorePage />} />
-        <Route
-          path="insights"
-          element={<ComingSoonPage title="AI Insights" description="Ask questions about your data in plain English once the AI module ships." />}
-        />
+        <Route path="insights" element={<AIChatPage />} />
         <Route
           path="reports"
           element={<ComingSoonPage title="Reports" description="Scheduled, white-labeled PDF/Excel reports land here." />}

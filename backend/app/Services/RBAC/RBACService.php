@@ -27,14 +27,15 @@ class RBACService
         'settings' => ['view', 'edit'],
         'support' => ['view', 'create'],
         'health' => ['view', 'recalculate'],
+        'ai_chat' => ['view', 'send'],
     ];
 
     /** System roles auto-created for every agency, with sane default abilities. */
     public const SYSTEM_ROLE_DEFAULTS = [
         'Agency Owner' => '*',
-        'Manager' => ['dashboards.*', 'reports.*', 'integrations.*', 'clients.*', 'team.view', 'support.*', 'health.*'],
-        'Analyst' => ['dashboards.view', 'reports.view', 'reports.export', 'integrations.view', 'health.view'],
-        'Viewer' => ['dashboards.view', 'reports.view', 'health.view'],
+        'Manager' => ['dashboards.*', 'reports.*', 'integrations.*', 'clients.*', 'team.view', 'support.*', 'health.*', 'ai_chat.*'],
+        'Analyst' => ['dashboards.view', 'reports.view', 'reports.export', 'integrations.view', 'health.view', 'ai_chat.*'],
+        'Viewer' => ['dashboards.view', 'reports.view', 'health.view', 'ai_chat.view'],
     ];
 
     public function permissionName(string $module, string $action): string

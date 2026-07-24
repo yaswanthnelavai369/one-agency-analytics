@@ -14,6 +14,8 @@ return new class extends Migration
 
             // Tenancy: a user belongs to exactly one agency (nullable for Master Admin),
             // and optionally to one client if their type is 'client'.
+            // Not constrained here — agencies/clients tables don't exist yet at this point
+            // in migration order; the FK is added in add_owner_and_agency_fks once they do.
             $table->unsignedBigInteger('agency_id')->nullable();
             $table->unsignedBigInteger('client_id')->nullable();
 

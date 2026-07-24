@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\Api\V1\Admin\AgencyController as AdminAgencyController;
+use App\Http\Controllers\Api\V1\Agency\AIChatController;
 use App\Http\Controllers\Api\V1\Agency\ClientController;
 use App\Http\Controllers\Api\V1\Agency\DashboardController;
 use App\Http\Controllers\Api\V1\Agency\HealthScoreController;
@@ -85,6 +86,10 @@ Route::prefix('v1')->group(function () {
 
             Route::middleware('permission:health.view')->get('/clients/{client}/health-score', [HealthScoreController::class, 'show']);
             Route::middleware('permission:health.recalculate')->post('/clients/{client}/health-score/recalculate', [HealthScoreController::class, 'recalculate']);
+
+            Route::middleware('permission:ai_chat.view')->get('/clients/{client}/ai-chat', [AIChatController::class, 'show']);
+            Route::middleware('permission:ai_chat.send')->post('/clients/{client}/ai-chat/messages', [AIChatController::class, 'sendMessage']);
+            Route::middleware('permission:ai_chat.view')->get('/ai-chat/quick-prompts', [AIChatController::class, 'quickPrompts']);
 
             // Route::apiResource('/team', TeamMemberController::class); // invite/list/update/remove
             // Route::put('/branding', [AgencyBrandingController::class, 'update']);
