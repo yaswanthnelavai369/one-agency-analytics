@@ -71,11 +71,15 @@ routes/console.php              Scheduled jobs (integration sync, health score c
 ## Modules
 
 - **Integrations** (`app/Integrations/`): `IntegrationProviderInterface` + `IntegrationManager`.
-  **Google Analytics 4** is built out end-to-end as the template — real OAuth2 flow + GA4 Data
-  API `runReport` calls (`GoogleAnalytics4Provider`). `IntegrationService` orchestrates
-  connect/callback/disconnect/sync; `SyncIntegrationDataJob` is the queued job the scheduler
-  dispatches per integration's `sync_frequency`; `analytics_metrics` is the generic time-series
-  table every provider writes into, keeping dashboard widgets provider-agnostic.
+  Two connectors are built out end-to-end: **Google Analytics 4** (real OAuth2 + GA4 Data API
+  `runReport`) and **Google Search Console** (real OAuth2 + `searchAnalytics.query`, mapping
+  clicks/impressions/ctr/position into the same generic metric keys GA4 uses). Adding the next
+  one (Google Ads, Meta Ads, ...) is one new class + one registry line — no schema, controller,
+  or frontend change needed (the Integrations page already renders whatever the backend
+  catalogue returns). `IntegrationService` orchestrates connect/callback/disconnect/sync,
+  `SyncIntegrationDataJob` is the queued job the scheduler dispatches on each integration's
+  `sync_frequency`, and `analytics_metrics` is the generic time-series table every provider
+  writes into (so dashboard widgets stay provider-agnostic).
 - **Dashboard builder** (`app/Dashboard/WidgetCatalogue.php` + `DashboardService`): layouts
   hold widgets with grid position/size matching `react-grid-layout`'s `{x,y,w,h}` shape 1:1.
   `WidgetCatalogue` covers the full KPI/list/health-score widget set from the spec.
@@ -126,6 +130,7 @@ of — otherwise it defaults to the platform's first agency.
 
 ## Suggested next step
 
-Another integration connector (Search Console pairs naturally with GA4), or automated anomaly
-detection (the Health Score calculators already compute the underlying signals — anomaly
-detection would watch those same metrics for sudden drops/spikes rather than just today's level).
+Another integration connector (Google Ads pairs naturally with the two Google connectors
+already built, or Meta Ads for a non-Google source), or automated anomaly detection (the
+Health Score calculators already compute the underlying signals — anomaly detection would
+watch those same metrics for sudden drops/spikes rather than just today's level).

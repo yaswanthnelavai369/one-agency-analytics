@@ -4,6 +4,7 @@ namespace App\Integrations;
 
 use App\Integrations\Contracts\IntegrationProviderInterface;
 use App\Integrations\GoogleAnalytics4\GoogleAnalytics4Provider;
+use App\Integrations\GoogleSearchConsole\GoogleSearchConsoleProvider;
 use InvalidArgumentException;
 
 /**
@@ -19,7 +20,7 @@ class IntegrationManager
     /** @var array<string, class-string<IntegrationProviderInterface>> */
     protected array $providers = [
         'google_analytics_4' => GoogleAnalytics4Provider::class,
-        // 'google_search_console' => GoogleSearchConsoleProvider::class,
+        'google_search_console' => GoogleSearchConsoleProvider::class,
         // 'google_ads' => GoogleAdsProvider::class,
         // 'meta_ads' => MetaAdsProvider::class,
         // ...one line per future connector.
