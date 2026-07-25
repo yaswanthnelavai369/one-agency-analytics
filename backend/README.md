@@ -95,14 +95,25 @@ routes/console.php              Scheduled jobs (integration sync, health score c
   numbers rather than guessing. Conversations persist per client/user; `ai_usage_logs` tracks
   credit usage against the agency's plan limit. `QuickPrompts` supplies the spec's suggested-
   prompt catalogue (e.g. "Why did traffic drop?").
+- **Automated anomaly detection** (`app/Anomaly/`): fourth application of the same pluggable
+  pattern — `AnomalyDetectorInterface` + `AnomalyEngine` registry. Six detectors (Traffic,
+  Conversion, Revenue, SEO, Ads, Integration Health) cover most of the spec's anomaly types
+  (traffic/conversion/revenue drop or spike, CTR drop, ranking loss, high CPC/CPA, campaign
+  failure, API failure, missing tracking codes) using transparent percent-deviation-from-
+  baseline math (`AnomalyMath`) rather than a black-box model. Each anomaly carries
+  plain-language possible causes and recommended fixes. Runs nightly via
+  `DetectAnomaliesJob`/`anomalies:detect`, or on demand; deduped per client/type/metric/day.
+  Email/WhatsApp/push notification dispatch is a clear extension point (left as a TODO in
+  `AnomalyDetectionService`) rather than half-building a notification pipeline now.
 
 ## What's not built yet
 
-- React frontend for Reports and Settings (Overview/Clients/Health Score/Integrations/AI
+- React frontend for Reports and Settings (Overview/Clients/Health Score/Alerts/Integrations/AI
   Insights are live)
-- More integration connectors (Search Console, Google Ads, Meta Ads, LinkedIn, TikTok, CRMs, ...)
-- Automated anomaly detection
-- Billing, scheduled reports, notifications
+- More integration connectors (Google Ads, Meta Ads, LinkedIn, TikTok, CRMs, ...)
+- Notification dispatch (email/WhatsApp/push) — anomalies are detected and stored, but not yet
+  pushed out; see the TODO in `AnomalyDetectionService::run()`
+- Billing, scheduled reports
 
 ## Getting it running
 
@@ -130,7 +141,6 @@ of — otherwise it defaults to the platform's first agency.
 
 ## Suggested next step
 
-Another integration connector (Google Ads pairs naturally with the two Google connectors
-already built, or Meta Ads for a non-Google source), or automated anomaly detection (the
-Health Score calculators already compute the underlying signals — anomaly detection would
-watch those same metrics for sudden drops/spikes rather than just today's level).
+Notification dispatch (email/WhatsApp/push) for anomalies now that they're being detected and
+stored, another integration connector (Google Ads pairs naturally with the two Google connectors
+already built), or the Reports module (scheduled/exportable, white-labeled).

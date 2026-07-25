@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\Api\V1\Admin\AgencyController as AdminAgencyController;
 use App\Http\Controllers\Api\V1\Agency\AIChatController;
+use App\Http\Controllers\Api\V1\Agency\AnomalyController;
 use App\Http\Controllers\Api\V1\Agency\ClientController;
 use App\Http\Controllers\Api\V1\Agency\DashboardController;
 use App\Http\Controllers\Api\V1\Agency\HealthScoreController;
@@ -90,6 +91,11 @@ Route::prefix('v1')->group(function () {
             Route::middleware('permission:ai_chat.view')->get('/clients/{client}/ai-chat', [AIChatController::class, 'show']);
             Route::middleware('permission:ai_chat.send')->post('/clients/{client}/ai-chat/messages', [AIChatController::class, 'sendMessage']);
             Route::middleware('permission:ai_chat.view')->get('/ai-chat/quick-prompts', [AIChatController::class, 'quickPrompts']);
+
+            Route::middleware('permission:anomalies.view')->get('/clients/{client}/anomalies', [AnomalyController::class, 'index']);
+            Route::middleware('permission:anomalies.manage')->post('/clients/{client}/anomalies/detect', [AnomalyController::class, 'detect']);
+            Route::middleware('permission:anomalies.manage')->post('/clients/{client}/anomalies/{anomaly}/acknowledge', [AnomalyController::class, 'acknowledge']);
+            Route::middleware('permission:anomalies.manage')->post('/clients/{client}/anomalies/{anomaly}/resolve', [AnomalyController::class, 'resolve']);
 
             // Route::apiResource('/team', TeamMemberController::class); // invite/list/update/remove
             // Route::put('/branding', [AgencyBrandingController::class, 'update']);

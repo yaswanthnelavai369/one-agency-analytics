@@ -6,6 +6,7 @@ import DashboardLayout from '../components/layout/DashboardLayout';
 import DashboardBuilderPage from '../pages/dashboard/DashboardBuilderPage';
 import ClientsListPage from '../pages/clients/ClientsListPage';
 import HealthScorePage from '../pages/dashboard/HealthScorePage';
+import AlertsPage from '../pages/dashboard/AlertsPage';
 import AIChatPage from '../pages/dashboard/AIChatPage';
 import IntegrationsPage from '../pages/dashboard/IntegrationsPage';
 import ComingSoonPage from '../pages/dashboard/ComingSoonPage';
@@ -29,6 +30,7 @@ export default function AppRoutes() {
         <Route index element={<DashboardBuilderPage />} />
         <Route path="clients" element={<ClientsListPage />} />
         <Route path="health-score" element={<HealthScorePage />} />
+        <Route path="alerts" element={<AlertsPage />} />
         <Route path="insights" element={<AIChatPage />} />
         <Route
           path="reports"

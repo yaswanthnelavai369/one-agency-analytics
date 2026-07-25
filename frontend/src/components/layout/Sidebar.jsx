@@ -7,6 +7,7 @@ import Stack from '@mui/material/Stack';
 import DashboardRoundedIcon from '@mui/icons-material/DashboardRounded';
 import GroupsRoundedIcon from '@mui/icons-material/GroupsRounded';
 import FavoriteRoundedIcon from '@mui/icons-material/FavoriteRounded';
+import NotificationsActiveRoundedIcon from '@mui/icons-material/NotificationsActiveRounded';
 import InsightsRoundedIcon from '@mui/icons-material/InsightsRounded';
 import DescriptionRoundedIcon from '@mui/icons-material/DescriptionRounded';
 import ExtensionRoundedIcon from '@mui/icons-material/ExtensionRounded';
@@ -19,6 +20,7 @@ const NAV_ITEMS = [
   { label: 'Overview', to: '/dashboard', icon: DashboardRoundedIcon },
   { label: 'Clients', to: '/dashboard/clients', icon: GroupsRoundedIcon },
   { label: 'Health Score', to: '/dashboard/health-score', icon: FavoriteRoundedIcon },
+  { label: 'Alerts', to: '/dashboard/alerts', icon: NotificationsActiveRoundedIcon },
   { label: 'AI Insights', to: '/dashboard/insights', icon: InsightsRoundedIcon },
   { label: 'Reports', to: '/dashboard/reports', icon: DescriptionRoundedIcon },
   { label: 'Integrations', to: '/dashboard/integrations', icon: ExtensionRoundedIcon },
