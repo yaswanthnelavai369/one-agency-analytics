@@ -29,7 +29,9 @@ frontend/   React + Vite + MUI SPA — glassmorphism design system, auth flows,
   category calculators, 90-day trend, rule-based improvement suggestions
 - ✅ AI Chat Assistant (backend + frontend): real Anthropic-backed chat, grounded in each
   client's actual metrics + Health Score, with plan-based usage limits
+- ✅ Automated anomaly detection (backend + frontend): 6 detectors watching traffic,
+  conversions, revenue, SEO, ads, and integration health, with plain-language causes/fixes
 - ⬜ More integration connectors (Google Ads, Meta Ads, LinkedIn, TikTok, CRMs, ...)
-- ⬜ Automated anomaly detection
-- ⬜ Billing, scheduled reports, notifications
+- ⬜ Notification dispatch (email/WhatsApp/push) for anomalies
+- ⬜ Billing, scheduled reports
 
