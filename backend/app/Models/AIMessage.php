@@ -7,6 +7,8 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class AIMessage extends Model
 {
+    protected $table = 'ai_messages';
+
     protected $fillable = ['conversation_id', 'role', 'content', 'tokens_used'];
 
     public function conversation(): BelongsTo

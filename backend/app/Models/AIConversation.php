@@ -8,6 +8,8 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class AIConversation extends Model
 {
+    protected $table = 'ai_conversations';
+
     protected $fillable = ['uuid', 'agency_id', 'client_id', 'user_id', 'title'];
 
     public function agency(): BelongsTo
