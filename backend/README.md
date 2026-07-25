@@ -122,22 +122,44 @@ composer install
 cp .env.example .env
 php artisan key:generate
 php artisan migrate --seed
-# Seeds: admin@search29.ai / ChangeMe!12345 (Master Admin)
-#        agency@search29.ai / ChangeMe!12345 (demo agency owner, with a demo client "Acme Corporation")
-# Change both passwords immediately outside of local dev.
 
 php artisan serve
-php artisan queue:work       # needed for SyncIntegrationDataJob / ComputeHealthScoreJob
-php artisan schedule:work    # needed for the hourly/daily integration sync + nightly health scores
+php artisan queue:work       # needed for SyncIntegrationDataJob / ComputeHealthScoreJob / DetectAnomaliesJob
+php artisan schedule:work    # needed for the hourly/daily integration sync + nightly health scores/anomalies
 ```
 
 Requires: PHP 8.2+, MySQL 8+, Redis (or set `CACHE_STORE`/`SESSION_DRIVER`/`QUEUE_CONNECTION`
 to `database`/`file` for a Redis-free local setup). Set `GOOGLE_CLIENT_ID`/`GOOGLE_CLIENT_SECRET`
-for the GA4 integration, and `ANTHROPIC_API_KEY` for the AI Chat Assistant, in `.env`.
+for the GA4/Search Console integrations, and `ANTHROPIC_API_KEY` for the AI Chat Assistant, in `.env`.
+
+### Test logins
+
+Seeded by `DemoDataSeeder` (called from `DatabaseSeeder`) — all under one demo agency
+("Search29 Agency") with one demo client ("Acme Corporation"), so the full RBAC matrix can be
+exercised without manually creating accounts. **All passwords: `ChangeMe!12345`** — change or
+remove this seeder before any real deployment.
+
+| Role | Email | Notes |
+|---|---|---|
+| Master Admin | `admin@search29.ai` | Global role — see the `X-Agency-ID` note below |
+| Agency Owner | `agency@search29.ai` | Full access to "Search29 Agency" |
+| Manager (team member) | `manager@search29.ai` | Most permissions, no billing/team-remove |
+| Analyst (team member) | `analyst@search29.ai` | View + export + AI chat, no create/edit |
+| Viewer (team member) | `viewer@search29.ai` | Read-only |
+| Client portal | `client@search29.ai` | Viewer access today — see caveat below |
 
 Master Admin note: since its role is global (not tied to one agency), agency-scoped endpoints
 need an `X-Agency-ID` header (or `agency_id` param) to say which agency you're acting on behalf
 of — otherwise it defaults to the platform's first agency.
+
+Client portal caveat: dedicated client-portal routes (scoped to *only* that client's own data,
+per the spec's Client role) aren't built yet — `routes/api.php` has a stub for them. The seeded
+`client@search29.ai` login is functional against today's agency-scoped routes via a Viewer role,
+but that means it can technically see the whole demo agency, not just Acme Corporation. Don't
+treat this as real tenant isolation for a client login until the client-portal routes ship.
+
+If you already have this running locally and just pulled the new seeder, you don't need to
+re-migrate — just run `php artisan db:seed --class=DemoDataSeeder` to add the new test logins.
 
 ## Suggested next step
 
