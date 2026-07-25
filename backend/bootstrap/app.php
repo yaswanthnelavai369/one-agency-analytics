@@ -2,6 +2,7 @@
 
 use App\Http\Middleware\CheckPermission;
 use App\Http\Middleware\EnsureAgencyOwnsResource;
+use App\Http\Middleware\EnsureClientAccess;
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
@@ -22,6 +23,7 @@ return Application::configure(basePath: dirname(__DIR__))
         $middleware->alias([
             'permission' => CheckPermission::class,
             'agency.owns' => EnsureAgencyOwnsResource::class,
+            'client.access' => EnsureClientAccess::class,
             'role' => \Spatie\Permission\Middleware\RoleMiddleware::class,
         ]);
     })

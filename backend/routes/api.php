@@ -9,6 +9,12 @@ use App\Http\Controllers\Api\V1\Agency\HealthScoreController;
 use App\Http\Controllers\Api\V1\Agency\IntegrationController;
 use App\Http\Controllers\Api\V1\Auth\AuthController;
 use App\Http\Controllers\Api\V1\Auth\TwoFactorController;
+use App\Http\Controllers\Api\V1\Client\ClientAIChatController;
+use App\Http\Controllers\Api\V1\Client\ClientAlertController;
+use App\Http\Controllers\Api\V1\Client\ClientDashboardController;
+use App\Http\Controllers\Api\V1\Client\ClientHealthScoreController;
+use App\Http\Controllers\Api\V1\Client\ClientIntegrationController;
+use App\Http\Controllers\Api\V1\Client\ClientPortalController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -102,7 +108,24 @@ Route::prefix('v1')->group(function () {
             // Route::post('/domain', [AgencyBrandingController::class, 'requestCustomDomain']);
         });
 
-        // --- Client portal: a client user viewing their own data ---
-        // Route::prefix('client')->group(function () { ... });
+        // --- Client portal: a client user viewing (and, for integrations, connecting)
+        // only their own data. Scoped entirely via EnsureClientAccess off the
+        // authenticated user's client_id — no {client} route param to guess/tamper with.
+        Route::prefix('client')->middleware('client.access')->group(function () {
+            Route::get('/me', [ClientPortalController::class, 'me']);
+            Route::get('/dashboard', [ClientDashboardController::class, 'show']);
+            Route::get('/health-score', [ClientHealthScoreController::class, 'show']);
+
+            Route::get('/integrations/catalogue', [ClientIntegrationController::class, 'catalogue']);
+            Route::get('/integrations', [ClientIntegrationController::class, 'index']);
+            Route::post('/integrations/{provider}/connect', [ClientIntegrationController::class, 'connect']);
+            Route::delete('/integrations/{integration}', [ClientIntegrationController::class, 'disconnect']);
+
+            Route::get('/ai-chat/quick-prompts', [ClientAIChatController::class, 'quickPrompts']);
+            Route::get('/ai-chat', [ClientAIChatController::class, 'show']);
+            Route::post('/ai-chat/messages', [ClientAIChatController::class, 'sendMessage']);
+
+            Route::get('/alerts', [ClientAlertController::class, 'index']);
+        });
     });
 });

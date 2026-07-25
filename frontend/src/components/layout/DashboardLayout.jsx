@@ -1,5 +1,5 @@
 import Box from '@mui/material/Box';
-import { Outlet } from 'react-router-dom';
+import { Outlet, Navigate } from 'react-router-dom';
 import AuroraBackground from '../ui/AuroraBackground';
 import Sidebar from './Sidebar';
 import Topbar from './Topbar';
@@ -7,6 +7,10 @@ import { useAuth } from '../../context/AuthContext';
 
 export default function DashboardLayout() {
   const { user } = useAuth();
+
+  if (user?.user_type === 'client') {
+    return <Navigate to="/portal" replace />;
+  }
 
   return (
     <Box sx={{ display: 'flex', minHeight: '100vh' }}>

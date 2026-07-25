@@ -45,7 +45,7 @@ export function AuthProvider({ children }) {
     storeToken(result.token);
     setUser(result.user);
     setStatus('authenticated');
-    return { twoFactorRequired: false };
+    return { twoFactorRequired: false, user: result.user };
   }, []);
 
   const verifyTwoFactor = useCallback(async ({ challengeToken, code }) => {
@@ -53,6 +53,7 @@ export function AuthProvider({ children }) {
     storeToken(result.token);
     setUser(result.user);
     setStatus('authenticated');
+    return result.user;
   }, []);
 
   const register = useCallback(async (data) => {

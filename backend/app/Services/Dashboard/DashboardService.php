@@ -3,6 +3,7 @@
 namespace App\Services\Dashboard;
 
 use App\Dashboard\WidgetCatalogue;
+use App\Models\Client;
 use App\Models\DashboardLayout;
 use App\Models\DashboardWidget;
 use App\Models\User;
@@ -18,6 +19,31 @@ class DashboardService
     public function listForUser(User $user, ?int $clientId = null)
     {
         return $this->layouts->visibleToUser($user->agency_id, $user->id, $clientId);
+    }
+
+    /**
+     * What the client portal reads: the first dashboard an agency team member
+     * has explicitly shared for this client. If none exists yet, auto-provisions
+     * one (owned by the agency's owner, since client-portal layouts aren't
+     * personally owned by any one team member) so a brand-new client isn't
+     * looking at an empty portal on day one.
+     */
+    public function clientFacingLayout(Client $client): DashboardLayout
+    {
+        $existing = $this->layouts->sharedForClient($client->id)->first();
+
+        if ($existing) {
+            return $existing;
+        }
+
+        $owner = $client->agency->owner;
+
+        return $this->createLayout($owner, [
+            'name' => "{$client->name} — Overview",
+            'client_id' => $client->id,
+            'is_shared' => true,
+            'is_default' => true,
+        ], withDefaultWidgets: true);
     }
 
     /** Creates a layout, optionally pre-populated with the default widget set (used on first client visit). */

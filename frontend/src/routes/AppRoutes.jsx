@@ -11,6 +11,13 @@ import AIChatPage from '../pages/dashboard/AIChatPage';
 import IntegrationsPage from '../pages/dashboard/IntegrationsPage';
 import ComingSoonPage from '../pages/dashboard/ComingSoonPage';
 import ProtectedRoute from './ProtectedRoute';
+import PortalProtectedRoute from './PortalProtectedRoute';
+import PortalLayout from '../components/portal/PortalLayout';
+import PortalOverviewPage from '../pages/portal/PortalOverviewPage';
+import PortalHealthScorePage from '../pages/portal/PortalHealthScorePage';
+import PortalIntegrationsPage from '../pages/portal/PortalIntegrationsPage';
+import PortalAIChatPage from '../pages/portal/PortalAIChatPage';
+import PortalAlertsPage from '../pages/portal/PortalAlertsPage';
 
 export default function AppRoutes() {
   return (
@@ -19,6 +26,7 @@ export default function AppRoutes() {
       <Route path="/register" element={<RegisterPage />} />
       <Route path="/two-factor" element={<TwoFactorPage />} />
 
+      {/* Agency-side dashboard */}
       <Route
         path="/dashboard"
         element={
@@ -41,6 +49,22 @@ export default function AppRoutes() {
           path="settings"
           element={<ComingSoonPage title="Settings" description="Branding, team, billing, and account settings." />}
         />
+      </Route>
+
+      {/* Client portal — a narrower surface, scoped entirely to one client */}
+      <Route
+        path="/portal"
+        element={
+          <PortalProtectedRoute>
+            <PortalLayout />
+          </PortalProtectedRoute>
+        }
+      >
+        <Route index element={<PortalOverviewPage />} />
+        <Route path="health-score" element={<PortalHealthScorePage />} />
+        <Route path="integrations" element={<PortalIntegrationsPage />} />
+        <Route path="ai-chat" element={<PortalAIChatPage />} />
+        <Route path="alerts" element={<PortalAlertsPage />} />
       </Route>
 
       <Route path="/" element={<Navigate to="/dashboard" replace />} />

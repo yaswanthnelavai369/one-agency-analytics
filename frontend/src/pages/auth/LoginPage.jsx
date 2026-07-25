@@ -27,7 +27,7 @@ export default function LoginPage() {
       if (result.twoFactorRequired) {
         navigate('/two-factor', { state: { challengeToken: result.challengeToken } });
       } else {
-        navigate('/dashboard');
+        navigate(result.user?.user_type === 'client' ? '/portal' : '/dashboard');
       }
     } catch (err) {
       setError(err.response?.data?.message || 'Unable to sign in. Check your credentials and try again.');

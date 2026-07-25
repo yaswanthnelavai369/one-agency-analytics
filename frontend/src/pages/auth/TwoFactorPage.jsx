@@ -28,8 +28,8 @@ export default function TwoFactorPage() {
     setError(null);
     setSubmitting(true);
     try {
-      await verifyTwoFactor({ challengeToken, code });
-      navigate('/dashboard');
+      const user = await verifyTwoFactor({ challengeToken, code });
+      navigate(user?.user_type === 'client' ? '/portal' : '/dashboard');
     } catch (err) {
       setError(err.response?.data?.errors?.code?.[0] || 'Invalid code. Try again.');
     } finally {

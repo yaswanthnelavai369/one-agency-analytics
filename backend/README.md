@@ -105,14 +105,29 @@ routes/console.php              Scheduled jobs (integration sync, health score c
   `DetectAnomaliesJob`/`anomalies:detect`, or on demand; deduped per client/type/metric/day.
   Email/WhatsApp/push notification dispatch is a clear extension point (left as a TODO in
   `AnomalyDetectionService`) rather than half-building a notification pipeline now.
+- **Client portal** (`app/Http/Controllers/Api/V1/Client/` + `EnsureClientAccess`): a Client
+  role gets a narrower, dedicated `/client/*` route surface — no `{client}` route param to
+  guess or tamper with, since scoping comes entirely from the authenticated user's own
+  `client_id`. Reuses the same services agency routes use (`DashboardService`,
+  `HealthScoreService`, `IntegrationService`, `AIChatService`, `AnomalyDetectionService`)
+  rather than duplicating logic, so a fix or feature in one place benefits both surfaces.
+  Covers the spec's Client abilities that map to modules already built: view own dashboard
+  (read-only — `DashboardService::clientFacingLayout()` auto-provisions one from an agency
+  team member's shared layout, or defaults, the first time a client logs in), connect/
+  disconnect own integrations, view Health Score, ask the AI assistant, and view (read-only)
+  alerts. Goals and agency↔client chat aren't built yet (no Goals or messaging module exists
+  to scope).
 
 ## What's not built yet
 
-- React frontend for Reports and Settings (Overview/Clients/Health Score/Alerts/Integrations/AI
-  Insights are live)
+- React frontend for Reports and Settings (agency: Overview/Clients/Health Score/Alerts/
+  Integrations/AI Insights are live; portal: Overview/Health Score/Integrations/Ask AI/Alerts
+  are live)
 - More integration connectors (Google Ads, Meta Ads, LinkedIn, TikTok, CRMs, ...)
 - Notification dispatch (email/WhatsApp/push) — anomalies are detected and stored, but not yet
   pushed out; see the TODO in `AnomalyDetectionService::run()`
+- Goals module and agency↔client chat (both listed as Client-role abilities in the spec, but
+  no backing module exists yet)
 - Billing, scheduled reports
 
 ## Getting it running
@@ -146,17 +161,11 @@ remove this seeder before any real deployment.
 | Manager (team member) | `manager@search29.ai` | Most permissions, no billing/team-remove |
 | Analyst (team member) | `analyst@search29.ai` | View + export + AI chat, no create/edit |
 | Viewer (team member) | `viewer@search29.ai` | Read-only |
-| Client portal | `client@search29.ai` | Viewer access today — see caveat below |
+| Client portal | `client@search29.ai` | Scoped to only "Acme Corporation" via the real `/client/*` routes |
 
 Master Admin note: since its role is global (not tied to one agency), agency-scoped endpoints
 need an `X-Agency-ID` header (or `agency_id` param) to say which agency you're acting on behalf
 of — otherwise it defaults to the platform's first agency.
-
-Client portal caveat: dedicated client-portal routes (scoped to *only* that client's own data,
-per the spec's Client role) aren't built yet — `routes/api.php` has a stub for them. The seeded
-`client@search29.ai` login is functional against today's agency-scoped routes via a Viewer role,
-but that means it can technically see the whole demo agency, not just Acme Corporation. Don't
-treat this as real tenant isolation for a client login until the client-portal routes ship.
 
 If you already have this running locally and just pulled the new seeder, you don't need to
 re-migrate — just run `php artisan db:seed --class=DemoDataSeeder` to add the new test logins.
@@ -164,5 +173,5 @@ re-migrate — just run `php artisan db:seed --class=DemoDataSeeder` to add the 
 ## Suggested next step
 
 Notification dispatch (email/WhatsApp/push) for anomalies now that they're being detected and
-stored, another integration connector (Google Ads pairs naturally with the two Google connectors
-already built), or the Reports module (scheduled/exportable, white-labeled).
+stored, a Goals module (would round out the Client portal's abilities), or the Reports module
+(scheduled/exportable, white-labeled).

@@ -42,7 +42,7 @@ class DemoDataSeeder extends Seeder
                 ['Manager (team member)', 'manager@search29.ai', self::PASSWORD, 'Most permissions, no billing/team-remove'],
                 ['Analyst (team member)', 'analyst@search29.ai', self::PASSWORD, 'View + export + AI chat, no edit/create'],
                 ['Viewer (team member)', 'viewer@search29.ai', self::PASSWORD, 'Read-only'],
-                ['Client portal', 'client@search29.ai', self::PASSWORD, 'Viewer access — client-portal routes (scoped to only their own client) are not built yet, see backend README'],
+                ['Client portal', 'client@search29.ai', self::PASSWORD, 'Sees only "Acme Corporation" via the /client/* routes'],
             ]
         );
     }
@@ -151,12 +151,8 @@ class DemoDataSeeder extends Seeder
             $user->forceFill(['agency_id' => $agency->id, 'client_id' => $client->id])->save();
         }
 
-        // NOTE: dedicated client-portal routes (scoped to only this client's own data)
-        // aren't built yet — routes/api.php has a stub for them. Granting Viewer here
-        // makes this login functional against today's agency-scoped routes, but it can
-        // technically see the whole agency, not just Acme Corporation. Don't treat this
-        // as real tenant isolation for a client login until the client-portal routes ship.
-        app()->make(PermissionRegistrar::class)->forgetCachedPermissions();
-        app(RBACService::class)->assignRole($user, 'Viewer', $agency);
+        // No Spatie role needed: client-portal access is scoped entirely by
+        // EnsureClientAccess (user_type='client' + client_id match), not by
+        // permission checks — see routes/api.php's /client/* group.
     }
 }

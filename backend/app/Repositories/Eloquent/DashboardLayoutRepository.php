@@ -44,4 +44,15 @@ class DashboardLayoutRepository extends BaseRepository implements DashboardLayou
             ->with('widgets')
             ->first();
     }
+
+    public function sharedForClient(int $clientId): Collection
+    {
+        return $this->model->newQuery()
+            ->where('client_id', $clientId)
+            ->where('is_shared', true)
+            ->with('widgets')
+            ->orderByDesc('is_default')
+            ->orderByDesc('updated_at')
+            ->get();
+    }
 }
