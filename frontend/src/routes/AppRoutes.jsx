@@ -7,6 +7,7 @@ import DashboardBuilderPage from '../pages/dashboard/DashboardBuilderPage';
 import ClientsListPage from '../pages/clients/ClientsListPage';
 import HealthScorePage from '../pages/dashboard/HealthScorePage';
 import AlertsPage from '../pages/dashboard/AlertsPage';
+import GoalsPage from '../pages/dashboard/GoalsPage';
 import AIChatPage from '../pages/dashboard/AIChatPage';
 import IntegrationsPage from '../pages/dashboard/IntegrationsPage';
 import ComingSoonPage from '../pages/dashboard/ComingSoonPage';
@@ -15,6 +16,7 @@ import PortalProtectedRoute from './PortalProtectedRoute';
 import PortalLayout from '../components/portal/PortalLayout';
 import PortalOverviewPage from '../pages/portal/PortalOverviewPage';
 import PortalHealthScorePage from '../pages/portal/PortalHealthScorePage';
+import PortalGoalsPage from '../pages/portal/PortalGoalsPage';
 import PortalIntegrationsPage from '../pages/portal/PortalIntegrationsPage';
 import PortalAIChatPage from '../pages/portal/PortalAIChatPage';
 import PortalAlertsPage from '../pages/portal/PortalAlertsPage';
@@ -39,6 +41,7 @@ export default function AppRoutes() {
         <Route path="clients" element={<ClientsListPage />} />
         <Route path="health-score" element={<HealthScorePage />} />
         <Route path="alerts" element={<AlertsPage />} />
+        <Route path="goals" element={<GoalsPage />} />
         <Route path="insights" element={<AIChatPage />} />
         <Route
           path="reports"
@@ -62,6 +65,7 @@ export default function AppRoutes() {
       >
         <Route index element={<PortalOverviewPage />} />
         <Route path="health-score" element={<PortalHealthScorePage />} />
+        <Route path="goals" element={<PortalGoalsPage />} />
         <Route path="integrations" element={<PortalIntegrationsPage />} />
         <Route path="ai-chat" element={<PortalAIChatPage />} />
         <Route path="alerts" element={<PortalAlertsPage />} />

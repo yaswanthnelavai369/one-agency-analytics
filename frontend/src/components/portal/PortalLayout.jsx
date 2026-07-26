@@ -23,6 +23,7 @@ import { portalApi } from '../../api/portal';
 const TABS = [
   { label: 'Overview', to: '/portal' },
   { label: 'Health Score', to: '/portal/health-score' },
+  { label: 'Goals', to: '/portal/goals' },
   { label: 'Integrations', to: '/portal/integrations' },
   { label: 'Ask AI', to: '/portal/ai-chat' },
   { label: 'Alerts', to: '/portal/alerts' },

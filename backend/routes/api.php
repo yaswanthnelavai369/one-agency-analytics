@@ -5,6 +5,7 @@ use App\Http\Controllers\Api\V1\Agency\AIChatController;
 use App\Http\Controllers\Api\V1\Agency\AnomalyController;
 use App\Http\Controllers\Api\V1\Agency\ClientController;
 use App\Http\Controllers\Api\V1\Agency\DashboardController;
+use App\Http\Controllers\Api\V1\Agency\GoalController;
 use App\Http\Controllers\Api\V1\Agency\HealthScoreController;
 use App\Http\Controllers\Api\V1\Agency\IntegrationController;
 use App\Http\Controllers\Api\V1\Auth\AuthController;
@@ -12,6 +13,7 @@ use App\Http\Controllers\Api\V1\Auth\TwoFactorController;
 use App\Http\Controllers\Api\V1\Client\ClientAIChatController;
 use App\Http\Controllers\Api\V1\Client\ClientAlertController;
 use App\Http\Controllers\Api\V1\Client\ClientDashboardController;
+use App\Http\Controllers\Api\V1\Client\ClientGoalController;
 use App\Http\Controllers\Api\V1\Client\ClientHealthScoreController;
 use App\Http\Controllers\Api\V1\Client\ClientIntegrationController;
 use App\Http\Controllers\Api\V1\Client\ClientPortalController;
@@ -103,6 +105,16 @@ Route::prefix('v1')->group(function () {
             Route::middleware('permission:anomalies.manage')->post('/clients/{client}/anomalies/{anomaly}/acknowledge', [AnomalyController::class, 'acknowledge']);
             Route::middleware('permission:anomalies.manage')->post('/clients/{client}/anomalies/{anomaly}/resolve', [AnomalyController::class, 'resolve']);
 
+            Route::middleware('permission:goals.view')->get('/goals/catalogue', [GoalController::class, 'catalogue']);
+            Route::middleware('permission:goals.view')->get('/clients/{client}/goals', [GoalController::class, 'index']);
+            Route::middleware('permission:goals.create')->post('/clients/{client}/goals', [GoalController::class, 'store']);
+            Route::middleware('permission:goals.view')->get('/clients/{client}/goals/{goal}', [GoalController::class, 'show']);
+            Route::middleware('permission:goals.edit')->put('/clients/{client}/goals/{goal}', [GoalController::class, 'update']);
+            Route::middleware('permission:goals.edit')->post('/clients/{client}/goals/{goal}/progress', [GoalController::class, 'addProgress']);
+            Route::middleware('permission:goals.edit')->post('/clients/{client}/goals/{goal}/recompute', [GoalController::class, 'recompute']);
+            Route::middleware('permission:goals.edit')->post('/clients/{client}/goals/{goal}/archive', [GoalController::class, 'archive']);
+            Route::middleware('permission:goals.delete')->delete('/clients/{client}/goals/{goal}', [GoalController::class, 'destroy']);
+
             // Route::apiResource('/team', TeamMemberController::class); // invite/list/update/remove
             // Route::put('/branding', [AgencyBrandingController::class, 'update']);
             // Route::post('/domain', [AgencyBrandingController::class, 'requestCustomDomain']);
@@ -126,6 +138,11 @@ Route::prefix('v1')->group(function () {
             Route::post('/ai-chat/messages', [ClientAIChatController::class, 'sendMessage']);
 
             Route::get('/alerts', [ClientAlertController::class, 'index']);
+
+            Route::get('/goals/catalogue', [ClientGoalController::class, 'catalogue']);
+            Route::get('/goals', [ClientGoalController::class, 'index']);
+            Route::post('/goals', [ClientGoalController::class, 'store']);
+            Route::get('/goals/{goal}', [ClientGoalController::class, 'show']);
         });
     });
 });

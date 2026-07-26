@@ -29,14 +29,15 @@ class RBACService
         'health' => ['view', 'recalculate'],
         'ai_chat' => ['view', 'send'],
         'anomalies' => ['view', 'manage'],
+        'goals' => ['view', 'create', 'edit', 'delete'],
     ];
 
     /** System roles auto-created for every agency, with sane default abilities. */
     public const SYSTEM_ROLE_DEFAULTS = [
         'Agency Owner' => '*',
-        'Manager' => ['dashboards.*', 'reports.*', 'integrations.*', 'clients.*', 'team.view', 'support.*', 'health.*', 'ai_chat.*', 'anomalies.*'],
-        'Analyst' => ['dashboards.view', 'reports.view', 'reports.export', 'integrations.view', 'health.view', 'ai_chat.*', 'anomalies.*'],
-        'Viewer' => ['dashboards.view', 'reports.view', 'health.view', 'ai_chat.view', 'anomalies.view'],
+        'Manager' => ['dashboards.*', 'reports.*', 'integrations.*', 'clients.*', 'team.view', 'support.*', 'health.*', 'ai_chat.*', 'anomalies.*', 'goals.*'],
+        'Analyst' => ['dashboards.view', 'reports.view', 'reports.export', 'integrations.view', 'health.view', 'ai_chat.*', 'anomalies.*', 'goals.view', 'goals.create'],
+        'Viewer' => ['dashboards.view', 'reports.view', 'health.view', 'ai_chat.view', 'anomalies.view', 'goals.view'],
     ];
 
     public function permissionName(string $module, string $action): string

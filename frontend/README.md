@@ -77,6 +77,15 @@ triage them.
 conversation thread wired to the real Anthropic-backed backend, with the spec's suggested
 quick-prompt chips ("Why did traffic drop?", etc.) shown until the first message is sent.
 
+## Goals
+
+`GoalsPage` (agency, full edit rights: add/archive/delete, manual-progress input, "refresh from
+data" for auto-tracked goals) and `PortalGoalsPage` (client: create + view only) both use the
+shared `GoalCard` (progress bar, pace-status chip, forecast text) and `CreateGoalDialog`
+(template picker sourced from the backend's `GoalCatalogue`, so a new suggested template is a
+backend-only change). Goals falling behind pace near their deadline show up in the Alerts feed
+automatically — no separate "goal alerts" UI needed.
+
 ## Client Portal
 
 A second, narrower app surface at `/portal/*` for `user_type: 'client'` logins — separate
@@ -84,9 +93,9 @@ layout (`PortalLayout`: topbar + tabs, no sidebar), separate route guard
 (`PortalProtectedRoute`, which also redirects non-client users back to `/dashboard`, and
 `DashboardLayout` redirects client users the other way to `/portal`). Reuses the same
 components as the agency dashboard where the experience matches (`WidgetRenderer`,
-`HealthScoreDisplay`, `GlassCard`) rather than duplicating them — only the pages that need
-different scoping or fewer controls (no client selector, no edit/create actions) are portal-
-specific. The topbar reads the agency's white-label branding (logo, colors, "powered by"
+`HealthScoreDisplay`, `GoalCard`, `GlassCard`) rather than duplicating them — only the pages
+that need different scoping or fewer controls (no client selector, no edit/delete actions) are
+portal-specific. The topbar reads the agency's white-label branding (logo, colors, "powered by"
 visibility) from `/client/me`.
 
 ## Running it
@@ -110,5 +119,6 @@ user's `user_type`. See the backend README's test-login table for accounts cover
 - More integration providers (Google Ads, Meta Ads, ...) — the Integrations page (both agency
   and portal) already renders whatever the backend's catalogue returns, so no frontend change
   needed when a new provider is added backend-side
+- Agency↔client chat UI, once a messaging module exists backend-side
 - Code-split the bundle (currently a single ~1.1MB chunk — recharts + react-grid-layout are the
   main contributors; worth lazy-loading per-route, especially splitting portal vs. agency)

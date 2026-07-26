@@ -2,11 +2,16 @@
 
 use App\Console\Commands\ComputeHealthScores;
 use App\Console\Commands\DetectAnomalies;
+use App\Console\Commands\RecomputeGoalProgress;
 use App\Console\Commands\SyncDueIntegrations;
 use Illuminate\Support\Facades\Schedule;
 
 Schedule::command(SyncDueIntegrations::class, ['hourly'])->hourly();
 Schedule::command(SyncDueIntegrations::class, ['daily'])->dailyAt('03:00');
+
+// Runs after the daily sync so auto-tracked goals reflect that day's fresh metrics,
+// and before anomaly detection so GoalDeadlineDetector sees up-to-date progress.
+Schedule::command(RecomputeGoalProgress::class)->dailyAt('03:30');
 
 // Runs after the 03:00 daily sync so scores reflect that day's freshly-synced metrics.
 Schedule::command(ComputeHealthScores::class)->dailyAt('04:00');

@@ -45,6 +45,7 @@ const TYPE_LABELS = {
   campaign_failure: 'Campaign Failure',
   api_failure: 'API Failure',
   missing_tracking_codes: 'Missing Tracking Codes',
+  goal_at_risk: 'Goal At Risk',
 };
 
 function AnomalyCard({ anomaly, onAcknowledge, onResolve, isUpdating }) {

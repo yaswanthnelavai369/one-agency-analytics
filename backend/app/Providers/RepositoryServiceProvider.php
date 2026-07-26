@@ -8,6 +8,7 @@ use App\Repositories\Contracts\AnalyticsMetricRepositoryInterface;
 use App\Repositories\Contracts\AnomalyRepositoryInterface;
 use App\Repositories\Contracts\ClientRepositoryInterface;
 use App\Repositories\Contracts\DashboardLayoutRepositoryInterface;
+use App\Repositories\Contracts\GoalRepositoryInterface;
 use App\Repositories\Contracts\HealthScoreRepositoryInterface;
 use App\Repositories\Contracts\IntegrationRepositoryInterface;
 use App\Repositories\Contracts\UserRepositoryInterface;
@@ -17,6 +18,7 @@ use App\Repositories\Eloquent\AnalyticsMetricRepository;
 use App\Repositories\Eloquent\AnomalyRepository;
 use App\Repositories\Eloquent\ClientRepository;
 use App\Repositories\Eloquent\DashboardLayoutRepository;
+use App\Repositories\Eloquent\GoalRepository;
 use App\Repositories\Eloquent\HealthScoreRepository;
 use App\Repositories\Eloquent\IntegrationRepository;
 use App\Repositories\Eloquent\UserRepository;
@@ -39,6 +41,7 @@ class RepositoryServiceProvider extends ServiceProvider
         HealthScoreRepositoryInterface::class => HealthScoreRepository::class,
         AIConversationRepositoryInterface::class => AIConversationRepository::class,
         AnomalyRepositoryInterface::class => AnomalyRepository::class,
+        GoalRepositoryInterface::class => GoalRepository::class,
     ];
 
     public function register(): void

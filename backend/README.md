@@ -96,38 +96,49 @@ routes/console.php              Scheduled jobs (integration sync, health score c
   credit usage against the agency's plan limit. `QuickPrompts` supplies the spec's suggested-
   prompt catalogue (e.g. "Why did traffic drop?").
 - **Automated anomaly detection** (`app/Anomaly/`): fourth application of the same pluggable
-  pattern — `AnomalyDetectorInterface` + `AnomalyEngine` registry. Six detectors (Traffic,
-  Conversion, Revenue, SEO, Ads, Integration Health) cover most of the spec's anomaly types
-  (traffic/conversion/revenue drop or spike, CTR drop, ranking loss, high CPC/CPA, campaign
-  failure, API failure, missing tracking codes) using transparent percent-deviation-from-
-  baseline math (`AnomalyMath`) rather than a black-box model. Each anomaly carries
-  plain-language possible causes and recommended fixes. Runs nightly via
-  `DetectAnomaliesJob`/`anomalies:detect`, or on demand; deduped per client/type/metric/day.
-  Email/WhatsApp/push notification dispatch is a clear extension point (left as a TODO in
-  `AnomalyDetectionService`) rather than half-building a notification pipeline now.
+  pattern — `AnomalyDetectorInterface` + `AnomalyEngine` registry. Seven detectors (Traffic,
+  Conversion, Revenue, SEO, Ads, Integration Health, Goal Deadline) cover most of the spec's
+  anomaly types (traffic/conversion/revenue drop or spike, CTR drop, ranking loss, high CPC/CPA,
+  campaign failure, API failure, missing tracking codes, goals falling behind pace) using
+  transparent percent-deviation-from-baseline math (`AnomalyMath`) rather than a black-box
+  model. Each anomaly carries plain-language possible causes and recommended fixes. Runs
+  nightly via `DetectAnomaliesJob`/`anomalies:detect`, or on demand; deduped per
+  client/type/metric/goal/day. Email/WhatsApp/push notification dispatch is a clear extension
+  point (left as a TODO in `AnomalyDetectionService`) rather than half-building a notification
+  pipeline now.
+- **Goal tracking** (`app/Goals/`): fifth application of the pluggable pattern for the
+  suggested-template catalogue (`GoalCatalogue`, same idiom as `WidgetCatalogue`/`QuickPrompts`).
+  Goals are either auto-tracked (linked to an `analytics_metrics` key, summed cumulatively for
+  running totals like Leads/Visitors or read as the latest snapshot for rates like CTR/ROAS) or
+  manual (progress entered by hand). `GoalMath` computes achievement rate, expected-progress-by-
+  now, pace status, and a simple linear-projection completion date — same transparent-formula
+  philosophy as `ScoreMath`/`AnomalyMath`. Deadline alerts are fulfilled by reusing the anomaly
+  pipeline (`GoalDeadlineDetector`) rather than a second, parallel alerting mechanism — a goal
+  falling behind shows up in the same Alerts feed as a traffic drop. `goal_progress` stores
+  daily snapshots for the trend chart / historical comparison.
 - **Client portal** (`app/Http/Controllers/Api/V1/Client/` + `EnsureClientAccess`): a Client
   role gets a narrower, dedicated `/client/*` route surface — no `{client}` route param to
   guess or tamper with, since scoping comes entirely from the authenticated user's own
   `client_id`. Reuses the same services agency routes use (`DashboardService`,
-  `HealthScoreService`, `IntegrationService`, `AIChatService`, `AnomalyDetectionService`)
-  rather than duplicating logic, so a fix or feature in one place benefits both surfaces.
-  Covers the spec's Client abilities that map to modules already built: view own dashboard
+  `HealthScoreService`, `IntegrationService`, `AIChatService`, `AnomalyDetectionService`,
+  `GoalService`) rather than duplicating logic, so a fix or feature in one place benefits both
+  surfaces. Covers every spec'd Client ability with a backing module: view own dashboard
   (read-only — `DashboardService::clientFacingLayout()` auto-provisions one from an agency
   team member's shared layout, or defaults, the first time a client logs in), connect/
-  disconnect own integrations, view Health Score, ask the AI assistant, and view (read-only)
-  alerts. Goals and agency↔client chat aren't built yet (no Goals or messaging module exists
-  to scope).
+  disconnect own integrations, view Health Score, create and view (not edit/delete) Goals, ask
+  the AI assistant, and view (read-only) alerts. Agency↔client chat is the one spec'd ability
+  still unbuilt — no messaging module exists to scope it against.
 
 ## What's not built yet
 
-- React frontend for Reports and Settings (agency: Overview/Clients/Health Score/Alerts/
-  Integrations/AI Insights are live; portal: Overview/Health Score/Integrations/Ask AI/Alerts
-  are live)
+- React frontend for Reports and Settings (agency: Overview/Clients/Health Score/Alerts/Goals/
+  Integrations/AI Insights are live; portal: Overview/Health Score/Goals/Integrations/Ask AI/
+  Alerts are live)
 - More integration connectors (Google Ads, Meta Ads, LinkedIn, TikTok, CRMs, ...)
-- Notification dispatch (email/WhatsApp/push) — anomalies are detected and stored, but not yet
-  pushed out; see the TODO in `AnomalyDetectionService::run()`
-- Goals module and agency↔client chat (both listed as Client-role abilities in the spec, but
-  no backing module exists yet)
+- Notification dispatch (email/WhatsApp/push) — anomalies (including goal-deadline alerts) are
+  detected and stored, but not yet pushed out; see the TODO in `AnomalyDetectionService::run()`
+- Agency↔client chat (listed as a Client-role ability in the spec, but no messaging module
+  exists yet)
 - Billing, scheduled reports
 
 ## Getting it running
@@ -172,6 +183,6 @@ re-migrate — just run `php artisan db:seed --class=DemoDataSeeder` to add the 
 
 ## Suggested next step
 
-Notification dispatch (email/WhatsApp/push) for anomalies now that they're being detected and
-stored, a Goals module (would round out the Client portal's abilities), or the Reports module
-(scheduled/exportable, white-labeled).
+Notification dispatch (email/WhatsApp/push) — now that anomalies (including goal-deadline
+alerts) are detected and stored, this is the piece that gets them in front of a person instead
+of waiting to be checked — or the Reports module (scheduled/exportable, white-labeled).

@@ -15,4 +15,8 @@ export const portalApi = {
   sendMessage: (message) => apiClient.post('/client/ai-chat/messages', { message }).then((r) => r.data),
 
   alerts: () => apiClient.get('/client/alerts').then((r) => r.data),
+
+  goalsCatalogue: () => apiClient.get('/client/goals/catalogue').then((r) => r.data),
+  goals: (status) => apiClient.get('/client/goals', { params: { status } }).then((r) => r.data),
+  createGoal: (data) => apiClient.post('/client/goals', data).then((r) => r.data),
 };

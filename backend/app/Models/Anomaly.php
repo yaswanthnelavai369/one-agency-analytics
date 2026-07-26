@@ -8,7 +8,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 class Anomaly extends Model
 {
     protected $fillable = [
-        'uuid', 'agency_id', 'client_id', 'integration_id', 'type', 'severity', 'metric',
+        'uuid', 'agency_id', 'client_id', 'integration_id', 'goal_id', 'type', 'severity', 'metric',
         'current_value', 'baseline_value', 'change_percent', 'message',
         'possible_causes', 'recommended_fixes', 'status',
         'acknowledged_by', 'acknowledged_at', 'resolved_at', 'detected_date',
@@ -36,6 +36,11 @@ class Anomaly extends Model
     public function integration(): BelongsTo
     {
         return $this->belongsTo(Integration::class);
+    }
+
+    public function goal(): BelongsTo
+    {
+        return $this->belongsTo(Goal::class);
     }
 
     public function acknowledgedBy(): BelongsTo

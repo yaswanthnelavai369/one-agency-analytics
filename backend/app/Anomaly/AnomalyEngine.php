@@ -5,6 +5,7 @@ namespace App\Anomaly;
 use App\Anomaly\Contracts\AnomalyDetectorInterface;
 use App\Anomaly\Detectors\AdsAnomalyDetector;
 use App\Anomaly\Detectors\ConversionAnomalyDetector;
+use App\Anomaly\Detectors\GoalDeadlineDetector;
 use App\Anomaly\Detectors\IntegrationHealthDetector;
 use App\Anomaly\Detectors\RevenueAnomalyDetector;
 use App\Anomaly\Detectors\SeoAnomalyDetector;
@@ -25,6 +26,7 @@ class AnomalyEngine
         SeoAnomalyDetector::class,
         AdsAnomalyDetector::class,
         IntegrationHealthDetector::class,
+        GoalDeadlineDetector::class,
     ];
 
     /** @return array<array> flat list of anomaly arrays from every detector */

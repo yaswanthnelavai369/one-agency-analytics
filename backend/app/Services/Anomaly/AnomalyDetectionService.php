@@ -19,10 +19,12 @@ class AnomalyDetectionService
 
     /**
      * Runs every detector for the client and persists any new findings.
-     * Dedup key is (client_id, type, metric, detected_date) — see the
+     * Dedup key is (client_id, type, metric, goal_id, detected_date) — see the
      * anomalies_dedup_unique index — so re-running detection on the same day
      * (e.g. a manual trigger after the nightly job already ran) never creates
-     * duplicate alerts.
+     * duplicate alerts. goal_id is part of the key so multiple goals going
+     * at-risk on the same day don't collide (they'd otherwise share
+     * type='goal_at_risk' + metric=null).
      *
      * @return Anomaly[] newly created anomalies (not ones that already existed today)
      */
@@ -33,9 +35,12 @@ class AnomalyDetectionService
         $created = [];
 
         foreach ($found as $anomaly) {
+            $goalId = $anomaly['goal_id'] ?? null;
+
             $existing = Anomaly::where('client_id', $client->id)
                 ->where('type', $anomaly['type'])
                 ->where('metric', $anomaly['metric'])
+                ->where('goal_id', $goalId)
                 ->where('detected_date', $today)
                 ->exists();
 
@@ -48,12 +53,13 @@ class AnomalyDetectionService
                     'client_id' => $client->id,
                     'type' => $anomaly['type'],
                     'metric' => $anomaly['metric'],
+                    'goal_id' => $goalId,
                     'detected_date' => $today,
                 ],
                 [
                     'uuid' => Str::uuid(),
                     'agency_id' => $client->agency_id,
-                    'integration_id' => $anomaly['integration_id'],
+                    'integration_id' => $anomaly['integration_id'] ?? null,
                     'severity' => $anomaly['severity'],
                     'current_value' => $anomaly['current_value'],
                     'baseline_value' => $anomaly['baseline_value'],
