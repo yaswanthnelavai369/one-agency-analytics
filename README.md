@@ -8,7 +8,7 @@ AI-driven insights, anomaly detection, and reporting.
 ## Repository layout
 
 ```
-backend/    Laravel 11 API — multi-tenant data model, auth + 2FA, RBAC, plus five full
+backend/    Laravel 11 API — multi-tenant data model, auth + 2FA, RBAC, plus six full
             vertical modules + a dedicated client-portal route surface (see backend/README.md).
             Verified running locally.
 frontend/   React + Vite + MUI SPA — glassmorphism design system, agency dashboard +
@@ -30,13 +30,16 @@ frontend/   React + Vite + MUI SPA — glassmorphism design system, agency dashb
   category calculators, 90-day trend, rule-based improvement suggestions
 - ✅ AI Chat Assistant (backend + frontend): real Anthropic-backed chat, grounded in each
   client's actual metrics + Health Score, with plan-based usage limits
-- ✅ Automated anomaly detection (backend + frontend): 6 detectors watching traffic,
-  conversions, revenue, SEO, ads, and integration health, with plain-language causes/fixes
+- ✅ Automated anomaly detection (backend + frontend): 7 detectors watching traffic,
+  conversions, revenue, SEO, ads, integration health, and goal deadlines, with plain-language
+  causes/fixes
+- ✅ Goal tracking (backend + frontend): auto-tracked or manual goals, pace/forecast math,
+  deadline alerts fed straight into the anomaly/alerts pipeline
 - ✅ Client portal (backend + frontend): a properly-scoped `/client/*`/`/portal` surface —
-  own dashboard, Health Score, integrations, AI chat, and alerts — separate from the agency
-  dashboard, with real tenant isolation via `EnsureClientAccess`
+  own dashboard, Health Score, Goals (create + view), integrations, AI chat, and alerts —
+  separate from the agency dashboard, with real tenant isolation via `EnsureClientAccess`
 - ⬜ More integration connectors (Google Ads, Meta Ads, LinkedIn, TikTok, CRMs, ...)
 - ⬜ Notification dispatch (email/WhatsApp/push) for anomalies
-- ⬜ Goals module, agency↔client chat
+- ⬜ Agency↔client chat
 - ⬜ Billing, scheduled reports
 
