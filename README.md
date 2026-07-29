@@ -8,7 +8,7 @@ AI-driven insights, anomaly detection, and reporting.
 ## Repository layout
 
 ```
-backend/    Laravel 11 API — multi-tenant data model, auth + 2FA, RBAC, plus six full
+backend/    Laravel 11 API — multi-tenant data model, auth + 2FA, RBAC, plus seven full
             vertical modules + a dedicated client-portal route surface (see backend/README.md).
             Verified running locally.
 frontend/   React + Vite + MUI SPA — glassmorphism design system, agency dashboard +
@@ -35,11 +35,18 @@ frontend/   React + Vite + MUI SPA — glassmorphism design system, agency dashb
   causes/fixes
 - ✅ Goal tracking (backend + frontend): auto-tracked or manual goals, pace/forecast math,
   deadline alerts fed straight into the anomaly/alerts pipeline
+- ✅ Notification dispatch (backend + frontend): 6 real channels (Email, Slack, Discord,
+  Teams, SMS, WhatsApp) — critical anomalies notify automatically; per-channel settings UI
+  with test-send
+- ✅ Agency↔client chat (backend + frontend): one thread per client shared by the whole
+  agency team and the client portal, polling-based delivery
 - ✅ Client portal (backend + frontend): a properly-scoped `/client/*`/`/portal` surface —
-  own dashboard, Health Score, Goals (create + view), integrations, AI chat, and alerts —
-  separate from the agency dashboard, with real tenant isolation via `EnsureClientAccess`
+  own dashboard, Health Score, Goals (create + view), integrations, AI chat, alerts, and chat
+  with the agency — separate from the agency dashboard, with real tenant isolation via
+  `EnsureClientAccess`
 - ⬜ More integration connectors (Google Ads, Meta Ads, LinkedIn, TikTok, CRMs, ...)
-- ⬜ Notification dispatch (email/WhatsApp/push) for anomalies
-- ⬜ Agency↔client chat
-- ⬜ Billing, scheduled reports
+- ⬜ Browser Push notifications (needs a service-worker subscription flow)
+- ⬜ Real-time chat (currently polling; `laravel/reverb` is a dependency but not wired up)
+- ⬜ Full agency Settings (branding/team/billing — only notification config exists today),
+  billing, scheduled reports
 
