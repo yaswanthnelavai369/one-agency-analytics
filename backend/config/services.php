@@ -21,4 +21,11 @@ return [
         // the AI-provider selector ships in Settings (see spec: OpenAI/Gemini/Claude).
         'default_provider' => env('AI_DEFAULT_PROVIDER', 'anthropic'),
     ],
+
+    'twilio' => [
+        'sid' => env('TWILIO_SID'),
+        'token' => env('TWILIO_TOKEN'),
+        'from_sms' => env('TWILIO_FROM_SMS'),
+        'from_whatsapp' => env('TWILIO_FROM_WHATSAPP'),
+    ],
 ];

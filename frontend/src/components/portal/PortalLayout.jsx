@@ -26,6 +26,7 @@ const TABS = [
   { label: 'Goals', to: '/portal/goals' },
   { label: 'Integrations', to: '/portal/integrations' },
   { label: 'Ask AI', to: '/portal/ai-chat' },
+  { label: 'Chat', to: '/portal/chat' },
   { label: 'Alerts', to: '/portal/alerts' },
 ];
 

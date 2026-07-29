@@ -19,4 +19,7 @@ export const portalApi = {
   goalsCatalogue: () => apiClient.get('/client/goals/catalogue').then((r) => r.data),
   goals: (status) => apiClient.get('/client/goals', { params: { status } }).then((r) => r.data),
   createGoal: (data) => apiClient.post('/client/goals', data).then((r) => r.data),
+
+  getChat: () => apiClient.get('/client/chat').then((r) => r.data),
+  sendChatMessage: (message) => apiClient.post('/client/chat/messages', { message }).then((r) => r.data),
 };

@@ -86,6 +86,16 @@ shared `GoalCard` (progress bar, pace-status chip, forecast text) and `CreateGoa
 backend-only change). Goals falling behind pace near their deadline show up in the Alerts feed
 automatically — no separate "goal alerts" UI needed.
 
+## Chat & Notification Settings
+
+`ChatThread` (shared) renders one message thread — agency's `ChatPage` (client selector, polls
+every 5s) and the portal's `PortalChatPage` (implicit own thread) both use it, with `mySide`
+('agency' | 'client') controlling bubble alignment. Delivery is polling-based, not WebSocket
+(see backend README for the real-time upgrade path). `NotificationSettingsPage` (now living at
+`/dashboard/settings`) is a real per-channel enable/config UI wired to the backend's six
+notification channels, with a "Send test" button per channel — it's not the full agency
+Settings page from the spec (branding/team/billing aren't here), just the notifications slice.
+
 ## Client Portal
 
 A second, narrower app surface at `/portal/*` for `user_type: 'client'` logins — separate
@@ -93,10 +103,10 @@ layout (`PortalLayout`: topbar + tabs, no sidebar), separate route guard
 (`PortalProtectedRoute`, which also redirects non-client users back to `/dashboard`, and
 `DashboardLayout` redirects client users the other way to `/portal`). Reuses the same
 components as the agency dashboard where the experience matches (`WidgetRenderer`,
-`HealthScoreDisplay`, `GoalCard`, `GlassCard`) rather than duplicating them — only the pages
-that need different scoping or fewer controls (no client selector, no edit/delete actions) are
-portal-specific. The topbar reads the agency's white-label branding (logo, colors, "powered by"
-visibility) from `/client/me`.
+`HealthScoreDisplay`, `GoalCard`, `ChatThread`, `GlassCard`) rather than duplicating them —
+only the pages that need different scoping or fewer controls (no client selector, no
+edit/delete actions) are portal-specific. The topbar reads the agency's white-label branding
+(logo, colors, "powered by" visibility) from `/client/me`.
 
 ## Running it
 
@@ -112,13 +122,16 @@ user's `user_type`. See the backend README's test-login table for accounts cover
 
 ## What's next
 
-- Wire `/dashboard/reports` and `/dashboard/settings` (currently placeholders) — the portal has
-  no equivalent yet either, since there's no Reports/Settings module on the backend
+- Wire `/dashboard/reports` (currently a placeholder) — the portal has no equivalent yet
+  either, since there's no Reports module on the backend
+- Full agency Settings (branding, team, billing) — `/dashboard/settings` currently only covers
+  notification channel config
 - Replace WidgetRenderer's placeholder data with real queries against `analytics_metrics`
   once metrics are flowing in from a synced integration
 - More integration providers (Google Ads, Meta Ads, ...) — the Integrations page (both agency
   and portal) already renders whatever the backend's catalogue returns, so no frontend change
   needed when a new provider is added backend-side
-- Agency↔client chat UI, once a messaging module exists backend-side
+- Real-time chat (swap ChatThread's polling for Reverb/Echo once broadcasting is wired up
+  backend-side — the component's props wouldn't need to change)
 - Code-split the bundle (currently a single ~1.1MB chunk — recharts + react-grid-layout are the
   main contributors; worth lazy-loading per-route, especially splitting portal vs. agency)

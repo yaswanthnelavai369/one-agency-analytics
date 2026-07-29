@@ -103,9 +103,8 @@ routes/console.php              Scheduled jobs (integration sync, health score c
   transparent percent-deviation-from-baseline math (`AnomalyMath`) rather than a black-box
   model. Each anomaly carries plain-language possible causes and recommended fixes. Runs
   nightly via `DetectAnomaliesJob`/`anomalies:detect`, or on demand; deduped per
-  client/type/metric/goal/day. Email/WhatsApp/push notification dispatch is a clear extension
-  point (left as a TODO in `AnomalyDetectionService`) rather than half-building a notification
-  pipeline now.
+  client/type/metric/goal/day. Critical-severity anomalies dispatch a real notification (see
+  below) instead of just sitting in the feed.
 - **Goal tracking** (`app/Goals/`): fifth application of the pluggable pattern for the
   suggested-template catalogue (`GoalCatalogue`, same idiom as `WidgetCatalogue`/`QuickPrompts`).
   Goals are either auto-tracked (linked to an `analytics_metrics` key, summed cumulatively for
@@ -116,29 +115,50 @@ routes/console.php              Scheduled jobs (integration sync, health score c
   pipeline (`GoalDeadlineDetector`) rather than a second, parallel alerting mechanism — a goal
   falling behind shows up in the same Alerts feed as a traffic drop. `goal_progress` stores
   daily snapshots for the trend chart / historical comparison.
+- **Notification dispatch** (`app/Notifications/`): sixth application of the pluggable
+  pattern — `NotificationChannelInterface` + `NotificationManager` registry. Six real
+  implementations: Email (works out of the box via Laravel's mailer), Slack/Discord/Microsoft
+  Teams (agency-configured webhook URL — broadcast channels, one message per channel regardless
+  of team size), and SMS/WhatsApp (real Twilio API calls, need `TWILIO_*` credentials in
+  `.env` to actually send — the code path is real, not stubbed, it just needs an account).
+  `NotificationService::notifyForAnomaly()` determines recipients (the agency's Owner/Manager
+  team on every enabled channel, plus that client's own portal users by email — spec: Client
+  role "Receives Notifications") and logs every attempt to `notification_logs`, success or
+  failure. Wired into `AnomalyDetectionService`: critical-severity anomalies dispatch
+  `SendAnomalyNotificationJob` automatically; warning/info stay feed-only to avoid alert
+  fatigue. Browser Push isn't built — it needs a service-worker subscription flow that's a
+  distinct unit of frontend work, noted as a clear next step rather than faked.
+- **Agency↔client chat** (`app/Services/Chat/`): one thread per client, shared by the whole
+  agency team and the whole client-portal side (not per-user, since this is "the agency talking
+  to the client," not one team member's private thread). Read state is tracked per-side
+  (`chat_threads.agency_last_read_at`/`client_last_read_at`) rather than per-message receipts,
+  keeping it simple while still supporting unread counts. Delivery is polling-based (5s
+  interval on the frontend), not WebSocket — `laravel/reverb` is already in `composer.json`
+  but unwired; upgrading this to real-time push is a clean next step that wouldn't touch the
+  data model.
 - **Client portal** (`app/Http/Controllers/Api/V1/Client/` + `EnsureClientAccess`): a Client
   role gets a narrower, dedicated `/client/*` route surface — no `{client}` route param to
   guess or tamper with, since scoping comes entirely from the authenticated user's own
   `client_id`. Reuses the same services agency routes use (`DashboardService`,
   `HealthScoreService`, `IntegrationService`, `AIChatService`, `AnomalyDetectionService`,
-  `GoalService`) rather than duplicating logic, so a fix or feature in one place benefits both
-  surfaces. Covers every spec'd Client ability with a backing module: view own dashboard
-  (read-only — `DashboardService::clientFacingLayout()` auto-provisions one from an agency
-  team member's shared layout, or defaults, the first time a client logs in), connect/
-  disconnect own integrations, view Health Score, create and view (not edit/delete) Goals, ask
-  the AI assistant, and view (read-only) alerts. Agency↔client chat is the one spec'd ability
-  still unbuilt — no messaging module exists to scope it against.
+  `GoalService`, `ChatService`) rather than duplicating logic, so a fix or feature in one place
+  benefits both surfaces. Now covers every spec'd Client ability: view own dashboard (read-only
+  — `DashboardService::clientFacingLayout()` auto-provisions one from an agency team member's
+  shared layout, or defaults, the first time a client logs in), connect/disconnect own
+  integrations, view Health Score, create and view (not edit/delete) Goals, ask the AI
+  assistant, view (read-only) alerts, and chat with the agency.
 
 ## What's not built yet
 
-- React frontend for Reports and Settings (agency: Overview/Clients/Health Score/Alerts/Goals/
-  Integrations/AI Insights are live; portal: Overview/Health Score/Goals/Integrations/Ask AI/
-  Alerts are live)
+- React frontend for Reports (Settings currently only covers notification channel config —
+  branding/team/billing settings aren't built; agency: Overview/Clients/Health Score/Alerts/
+  Goals/Chat/Integrations/AI Insights/Notifications are live; portal: Overview/Health
+  Score/Goals/Integrations/Ask AI/Chat/Alerts are live)
 - More integration connectors (Google Ads, Meta Ads, LinkedIn, TikTok, CRMs, ...)
-- Notification dispatch (email/WhatsApp/push) — anomalies (including goal-deadline alerts) are
-  detected and stored, but not yet pushed out; see the TODO in `AnomalyDetectionService::run()`
-- Agency↔client chat (listed as a Client-role ability in the spec, but no messaging module
-  exists yet)
+- Browser Push notifications (needs a service-worker subscription flow — a distinct unit of
+  frontend work; Email/Slack/Discord/Teams/SMS/WhatsApp are all real and working)
+- Real-time chat delivery (currently 5s polling; `laravel/reverb` is already a dependency but
+  not wired up for broadcasting)
 - Billing, scheduled reports
 
 ## Getting it running
@@ -183,6 +203,6 @@ re-migrate — just run `php artisan db:seed --class=DemoDataSeeder` to add the 
 
 ## Suggested next step
 
-Notification dispatch (email/WhatsApp/push) — now that anomalies (including goal-deadline
-alerts) are detected and stored, this is the piece that gets them in front of a person instead
-of waiting to be checked — or the Reports module (scheduled/exportable, white-labeled).
+Real-time chat delivery (wiring up the already-installed `laravel/reverb` instead of polling),
+Browser Push notifications (needs a service-worker subscription flow), or the Reports module
+(scheduled/exportable, white-labeled).

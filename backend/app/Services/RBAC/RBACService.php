@@ -35,7 +35,7 @@ class RBACService
     /** System roles auto-created for every agency, with sane default abilities. */
     public const SYSTEM_ROLE_DEFAULTS = [
         'Agency Owner' => '*',
-        'Manager' => ['dashboards.*', 'reports.*', 'integrations.*', 'clients.*', 'team.view', 'support.*', 'health.*', 'ai_chat.*', 'anomalies.*', 'goals.*'],
+        'Manager' => ['dashboards.*', 'reports.*', 'integrations.*', 'clients.*', 'team.view', 'support.*', 'health.*', 'ai_chat.*', 'anomalies.*', 'goals.*', 'settings.*'],
         'Analyst' => ['dashboards.view', 'reports.view', 'reports.export', 'integrations.view', 'health.view', 'ai_chat.*', 'anomalies.*', 'goals.view', 'goals.create'],
         'Viewer' => ['dashboards.view', 'reports.view', 'health.view', 'ai_chat.view', 'anomalies.view', 'goals.view'],
     ];

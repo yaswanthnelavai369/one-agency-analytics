@@ -8,8 +8,10 @@ import ClientsListPage from '../pages/clients/ClientsListPage';
 import HealthScorePage from '../pages/dashboard/HealthScorePage';
 import AlertsPage from '../pages/dashboard/AlertsPage';
 import GoalsPage from '../pages/dashboard/GoalsPage';
+import ChatPage from '../pages/dashboard/ChatPage';
 import AIChatPage from '../pages/dashboard/AIChatPage';
 import IntegrationsPage from '../pages/dashboard/IntegrationsPage';
+import NotificationSettingsPage from '../pages/dashboard/NotificationSettingsPage';
 import ComingSoonPage from '../pages/dashboard/ComingSoonPage';
 import ProtectedRoute from './ProtectedRoute';
 import PortalProtectedRoute from './PortalProtectedRoute';
@@ -19,6 +21,7 @@ import PortalHealthScorePage from '../pages/portal/PortalHealthScorePage';
 import PortalGoalsPage from '../pages/portal/PortalGoalsPage';
 import PortalIntegrationsPage from '../pages/portal/PortalIntegrationsPage';
 import PortalAIChatPage from '../pages/portal/PortalAIChatPage';
+import PortalChatPage from '../pages/portal/PortalChatPage';
 import PortalAlertsPage from '../pages/portal/PortalAlertsPage';
 
 export default function AppRoutes() {
@@ -42,16 +45,14 @@ export default function AppRoutes() {
         <Route path="health-score" element={<HealthScorePage />} />
         <Route path="alerts" element={<AlertsPage />} />
         <Route path="goals" element={<GoalsPage />} />
+        <Route path="chat" element={<ChatPage />} />
         <Route path="insights" element={<AIChatPage />} />
         <Route
           path="reports"
           element={<ComingSoonPage title="Reports" description="Scheduled, white-labeled PDF/Excel reports land here." />}
         />
         <Route path="integrations" element={<IntegrationsPage />} />
-        <Route
-          path="settings"
-          element={<ComingSoonPage title="Settings" description="Branding, team, billing, and account settings." />}
-        />
+        <Route path="settings" element={<NotificationSettingsPage />} />
       </Route>
 
       {/* Client portal — a narrower surface, scoped entirely to one client */}
@@ -68,6 +69,7 @@ export default function AppRoutes() {
         <Route path="goals" element={<PortalGoalsPage />} />
         <Route path="integrations" element={<PortalIntegrationsPage />} />
         <Route path="ai-chat" element={<PortalAIChatPage />} />
+        <Route path="chat" element={<PortalChatPage />} />
         <Route path="alerts" element={<PortalAlertsPage />} />
       </Route>
 

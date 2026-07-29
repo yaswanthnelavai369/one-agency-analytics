@@ -6,6 +6,7 @@ use App\Repositories\Contracts\AgencyRepositoryInterface;
 use App\Repositories\Contracts\AIConversationRepositoryInterface;
 use App\Repositories\Contracts\AnalyticsMetricRepositoryInterface;
 use App\Repositories\Contracts\AnomalyRepositoryInterface;
+use App\Repositories\Contracts\ChatRepositoryInterface;
 use App\Repositories\Contracts\ClientRepositoryInterface;
 use App\Repositories\Contracts\DashboardLayoutRepositoryInterface;
 use App\Repositories\Contracts\GoalRepositoryInterface;
@@ -16,6 +17,7 @@ use App\Repositories\Eloquent\AgencyRepository;
 use App\Repositories\Eloquent\AIConversationRepository;
 use App\Repositories\Eloquent\AnalyticsMetricRepository;
 use App\Repositories\Eloquent\AnomalyRepository;
+use App\Repositories\Eloquent\ChatRepository;
 use App\Repositories\Eloquent\ClientRepository;
 use App\Repositories\Eloquent\DashboardLayoutRepository;
 use App\Repositories\Eloquent\GoalRepository;
@@ -42,6 +44,7 @@ class RepositoryServiceProvider extends ServiceProvider
         AIConversationRepositoryInterface::class => AIConversationRepository::class,
         AnomalyRepositoryInterface::class => AnomalyRepository::class,
         GoalRepositoryInterface::class => GoalRepository::class,
+        ChatRepositoryInterface::class => ChatRepository::class,
     ];
 
     public function register(): void

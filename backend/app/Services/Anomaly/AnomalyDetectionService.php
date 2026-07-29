@@ -3,6 +3,7 @@
 namespace App\Services\Anomaly;
 
 use App\Anomaly\AnomalyEngine;
+use App\Jobs\SendAnomalyNotificationJob;
 use App\Models\Anomaly;
 use App\Models\Client;
 use App\Models\User;
@@ -73,10 +74,12 @@ class AnomalyDetectionService
 
             $created[] = $record;
 
-            // TODO: once the Notifications module ships, dispatch email/WhatsApp/push
-            // here for 'critical' severity anomalies (spec: "Send notifications. Email
-            // users. WhatsApp users. Push Notifications."). Left as a clear extension
-            // point rather than building a partial notification pipeline now.
+            // Critical severity only — warning/info anomalies still show up in the
+            // Alerts feed, but don't interrupt anyone. Keeps this from becoming the
+            // kind of notification system people learn to ignore.
+            if ($record->severity === 'critical') {
+                SendAnomalyNotificationJob::dispatch($record->id);
+            }
         }
 
         return $created;

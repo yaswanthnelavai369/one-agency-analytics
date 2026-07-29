@@ -3,15 +3,18 @@
 use App\Http\Controllers\Api\V1\Admin\AgencyController as AdminAgencyController;
 use App\Http\Controllers\Api\V1\Agency\AIChatController;
 use App\Http\Controllers\Api\V1\Agency\AnomalyController;
+use App\Http\Controllers\Api\V1\Agency\ChatController;
 use App\Http\Controllers\Api\V1\Agency\ClientController;
 use App\Http\Controllers\Api\V1\Agency\DashboardController;
 use App\Http\Controllers\Api\V1\Agency\GoalController;
 use App\Http\Controllers\Api\V1\Agency\HealthScoreController;
 use App\Http\Controllers\Api\V1\Agency\IntegrationController;
+use App\Http\Controllers\Api\V1\Agency\NotificationController;
 use App\Http\Controllers\Api\V1\Auth\AuthController;
 use App\Http\Controllers\Api\V1\Auth\TwoFactorController;
 use App\Http\Controllers\Api\V1\Client\ClientAIChatController;
 use App\Http\Controllers\Api\V1\Client\ClientAlertController;
+use App\Http\Controllers\Api\V1\Client\ClientChatController;
 use App\Http\Controllers\Api\V1\Client\ClientDashboardController;
 use App\Http\Controllers\Api\V1\Client\ClientGoalController;
 use App\Http\Controllers\Api\V1\Client\ClientHealthScoreController;
@@ -115,6 +118,15 @@ Route::prefix('v1')->group(function () {
             Route::middleware('permission:goals.edit')->post('/clients/{client}/goals/{goal}/archive', [GoalController::class, 'archive']);
             Route::middleware('permission:goals.delete')->delete('/clients/{client}/goals/{goal}', [GoalController::class, 'destroy']);
 
+            Route::middleware('permission:settings.view')->get('/notifications/catalogue', [NotificationController::class, 'catalogue']);
+            Route::middleware('permission:settings.view')->get('/notifications', [NotificationController::class, 'index']);
+            Route::middleware('permission:settings.edit')->put('/notifications/{channel}', [NotificationController::class, 'update']);
+            Route::middleware('permission:settings.edit')->post('/notifications/{channel}/test', [NotificationController::class, 'test']);
+            Route::middleware('permission:settings.view')->get('/notifications/logs', [NotificationController::class, 'logs']);
+
+            Route::middleware('permission:support.view')->get('/clients/{client}/chat', [ChatController::class, 'show']);
+            Route::middleware('permission:support.create')->post('/clients/{client}/chat/messages', [ChatController::class, 'sendMessage']);
+
             // Route::apiResource('/team', TeamMemberController::class); // invite/list/update/remove
             // Route::put('/branding', [AgencyBrandingController::class, 'update']);
             // Route::post('/domain', [AgencyBrandingController::class, 'requestCustomDomain']);
@@ -143,6 +155,9 @@ Route::prefix('v1')->group(function () {
             Route::get('/goals', [ClientGoalController::class, 'index']);
             Route::post('/goals', [ClientGoalController::class, 'store']);
             Route::get('/goals/{goal}', [ClientGoalController::class, 'show']);
+
+            Route::get('/chat', [ClientChatController::class, 'show']);
+            Route::post('/chat/messages', [ClientChatController::class, 'sendMessage']);
         });
     });
 });
